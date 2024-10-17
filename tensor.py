@@ -33,7 +33,10 @@ class Tensor:
 
     
     def print_tensor(self):
+        level = self.h
         for height in self.array:
+            print(f"Level: {len(height)-level+1}\n")
+            level = level - 1
             for row in height:
                 print(row)
             print()
@@ -90,6 +93,8 @@ class Tensor:
         n = self.max_len()
         return  3 * n ** 2 + 6* n + 4
     
+
+    # Specs Function
 
     def check_column_sum(self):
         '''
