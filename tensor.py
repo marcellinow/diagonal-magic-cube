@@ -31,6 +31,7 @@ class Tensor:
                 h_array.append(j_array)
             self.array.append(h_array)
 
+
     def print_tensor(self):
         level = self.h
         for height in self.array:
