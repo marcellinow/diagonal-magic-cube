@@ -109,12 +109,12 @@ class Simulated:
     
     def results(self):
         print('+------------------------ RESULTS -------------------------+\n')
-        print(f'      opt.mode: {self.opt_mode}')
+        print(f'      opt.mode: {self.obj_func.__name__}')
         print(f'cooling sched.: {self.cooling_schedule}')
         if self.damping != 1: print(f'       damping: {self.damping}\n')
         else: print('\n')
 
-        print(f'  initial temp: {self.t_max}')
+        print(f'  initial temp: {self.tmax}')
         print(f'    final temp: {self.t:0.6f}')
         print(f'     max steps: {self.step_max}')
         print(f'    final step: {self.step}\n')
@@ -148,16 +148,3 @@ class Simulated:
             min_bound, max_bound = self.bounds[i]
             neighbor[i] = min(max(neighbor[i],min_bound),max_bound)
         return neighbor
-
-    
-
-    
-            
-
-
-
-
-
-
-
-

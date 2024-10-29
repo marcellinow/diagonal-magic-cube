@@ -1,4 +1,5 @@
 from tensor import *
+from simulated import *
 
 # Initialization
 
@@ -50,5 +51,18 @@ goal_state = [
 ]
 problem_cube = Tensor(5,5,5)
 
-problem_cube.initial_state()
-problem_cube.print_tensor()
+cube = problem_cube.initial_state()
+
+cube.print_tensor()
+print()
+objective_function = cube.objective_function()
+print(objective_function)
+
+
+
+# Nathan
+
+# Marcell
+# model = Simulated(cube,obj_func=objective_function,bounds=[0,255])
+
+# NJ dan Jeremy

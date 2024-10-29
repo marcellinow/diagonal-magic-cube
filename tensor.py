@@ -4,6 +4,7 @@ Module to create the cubic
 '''
 
 import random
+import numpy as np
 
 class Tensor:
 
@@ -18,7 +19,7 @@ class Tensor:
         self.r = r
         self.c = c
         self.h = h
-
+        
         # Auto make tensor  r x c x h   with rank h
         self.array = []
 
@@ -92,61 +93,41 @@ class Tensor:
         n = self.max_len()
         return  3 * n ** 2 + 6* n + 4
     
+    def objective_function(self):
+        Z = 0
+        n = self.max_len()
+        MC = self.magic_constant()
 
-    # Specs Function
+        # Row
+        # print("--ROW--")
+        for level in range(n):
+            # print(f"Level: {level+1}\n")
+            for row in range(n):
+                # print(f"Row: {row+1}\n")
+                row_sum = np.sum(self.array[level][row][:])
+                # print(f"Row Sum: {row_sum}\n")
+                Z += (row_sum - MC) ** 2
+                # print(f"Z: {Z}\n")
+        # print("\n")
+        # print("--COLUMN--")
+        # Column
+        for level in range(n):
+            # print(f"Level: {level+1}\n")
+            for col in range(n):
+                # print(f"Column: {col+1}\n")
+                col_sum = np.sum(self.array[level][:][col])
+                # print(f"Col Sum: {col_sum}\n")
+                Z += (col_sum - MC) ** 2
+                # print(f"Z: {Z}\n")
+        # Main Diagonal
+        for level in range(n):
+            # print(f"Level: {level+1}\n")
+            for k in range(n):
+                diag_sum_right = np.sum(self.array[k][k])
+                # print(f"diag_sum_right: {diag_sum_right}\n")
+                diag_sum_left = np.sum(self.array[k][n-1])
+                # print(f"diag_sum_left: {diag_sum_left}\n")
+                Z += ((diag_sum_right + diag_sum_left) - MC) ** 2
+                # print(f"diag_sum: {diag_sum_left + diag_sum_right}\n")
 
-    def check_column_sum(self):
-        '''
-        Function to check if the sum of each column of the matrix is the same
-        '''
-        sum_columns = []
-        
-        for height in self.array:
-            for col in range(self.c):
-                sum_columns.append(sum(height[row][col] for row in range(self.r)))
-
-        if len(set(sum_columns)) == 1:
-            return True
-        else:
-            return False
-        
-
-    def check_row_sum(self):
-        '''
-        Function to check if the sum of each row of the matrix is the same
-        '''
-        sum_rows = []
-
-        for height in self.array:
-            for row in range(self.r):
-                sum_rows.append(sum(height[row][col] for col in range(self.c)))
-
-        if len(set(sum_rows)) == 1:
-            return True
-        else:
-            return False
-    
-    def check_diagonal_sum(self):
-        '''
-        Function to check if the sum of main diagonal of the matrix is the same
-        '''
-
-        sum_diagonal = []
-
-        for height in self.array:
-            first_diag_sum = 0
-            second_diag_sum = 0
-            for i in range(self.r):
-                first_diag_sum += height[i][i]
-                second_diag_sum += height[i][self.c - i - 1]
-            sum_diagonal.append(first_diag_sum)
-            sum_diagonal.append(second_diag_sum)
-
-        if len(set(sum_diagonal)) == 1:
-            return True
-        else:
-            return False
-
-    def is_magic_cube():
-        '''
-        '''
+        return Z
