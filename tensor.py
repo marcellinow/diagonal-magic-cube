@@ -4,6 +4,7 @@ Module to create the cubic
 '''
 
 import random
+import matplotlib.pyplot as plt
 import numpy as np
 
 class Tensor:
@@ -41,6 +42,31 @@ class Tensor:
             for row in height:
                 print(row)
             print()
+
+    def plot_cube(self,title="Tensor Cube"):
+        for h in range(self.h):
+            fig = plt.figure(figsize=(8, 8))
+            ax = fig.add_subplot(111, projection="3d")
+            ax.set_box_aspect([self.r, self.c, 1])
+
+            # Plot cells within the current level
+            for r in range(self.r):
+                for c in range(self.c):
+                    ax.text(r, c, 0, f"{self.array[h][r][c]}", ha="center", va="center", fontsize=14, color="blue")
+                    ax.scatter(r, c, 0, c="orange", s=500, edgecolors="k", alpha=0.4)
+
+            # Add lines for cube structure on certain level
+            for r in range(self.r):
+                ax.plot([r, r], [0, self.c - 1], [0, 0], color="black", linestyle="--")
+            for c in range(self.c):
+                ax.plot([0, self.r - 1], [c, c], [0, 0], color="red", linestyle="--")
+
+            # Labels and title
+            ax.set_xlabel("Column-axis")
+            ax.set_ylabel("Row-axis")
+            ax.set_zlabel("Level")
+            plt.title(f"{title} - Level {h + 1}")
+            plt.show()
 
     def is_in_tensor(self, v):
         '''
