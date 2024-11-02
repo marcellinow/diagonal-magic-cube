@@ -5,7 +5,7 @@ from simulated import *
 
 
 # Goal State
-# What are we trying to achieve
+# What we are trying to achieve
 goal_state = [
 
 # Level 1
