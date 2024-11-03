@@ -12,6 +12,7 @@ https://nathanrooy.github.io/posts/2020-05-14/simulated-annealing-with-python/
 import random
 import numpy as np
 from math import exp
+from tensor import *
 
 class Simulated:
     def __init__(self,cube,tmin=0,tmax=100,cooling_schedule='linear',alpha = None,step_max = 1000,bounds = [],damping = 1):
@@ -110,7 +111,8 @@ class Simulated:
             self.t = self.update_t(self.step)
             self.step +=1
         self.acceptance_rate = self.accept / self.step
-    
+    def final_state(self):
+        return Tensor(5,5,5,self.best_state).print_tensor()
     def results(self):
         print('+------------------------ RESULTS -------------------------+\n')
         # print(f'      opt.mode: {self.obj_func}')
@@ -144,20 +146,29 @@ class Simulated:
     # Move Function
     def move(self):
         shape = self.cube.shape
-
-        first = (np.random.randint(0, shape[0]), 
-                np.random.randint(0, shape[1]), 
-                np.random.randint(0, shape[2]))
-        second = first
-        while second == first:
-            second = (np.random.randint(0, shape[0]), 
+        low_t = 0.1 * self.tmax
+        if self.t > low_t:
+            first = (np.random.randint(0, shape[0]), 
                     np.random.randint(0, shape[1]), 
                     np.random.randint(0, shape[2]))
-        
-        # Swap the elements at the two selected positions
-        temp = self.cube.array[first]
-        self.cube.array[first] = self.cube.array[second]
-        self.cube.array[second] = temp
+            second = first
+            while second == first:
+                second = (np.random.randint(0, shape[0]), 
+                        np.random.randint(0, shape[1]), 
+                        np.random.randint(0, shape[2]))
+            
+            self.cube.array[first], self.cube.array[second] = self.cube.array[second], self.cube.array[first]
+        else:
+            position = (np.random.randint(0, shape[0]), 
+                    np.random.randint(0, shape[1]), 
+                    np.random.randint(0, shape[2]))
+
+            original_value = self.cube.array[position]
+
+            perturbation = np.random.normal(0, self.damping) * (self.t)
+            new_value = original_value + perturbation
+
+            self.cube.array[position] = np.clip(new_value, 0, 125)
         
         return self.cube
         
