@@ -51,6 +51,9 @@ class Simulated:
         self.current_energy = self.obj_func
         self.best_energy = self.current_energy
 
+        # Heuristics Atributes
+        self.ideal_energy = 1278394.0
+
         print(f"Initial Energy: {self.current_energy}\n")
 
         if self.cooling_schedule == 'linear':
@@ -77,26 +80,35 @@ class Simulated:
 
         self.step = 1
         self.accept = 0
-        print(f"Initial State: {self.current_state}\n")
+        # print(f"Initial State: {self.current_state}\n")
 
         while self.step <= self.step_max and self.t >= self.tmin:
+        # while self.t >= self.tmin:
             
             choosen_neighbor = self.move()
-            print(f"choosen_neighbor = {choosen_neighbor.array}\n")
-            # print(f"best_energy = {self.best_energy}\n")
+        
             e_n = choosen_neighbor.objective_function()
-            if e_n < self.best_energy:
-                print(5*"=")
-                print(f"e_n = {e_n}\n")
     
             de = e_n - self.current_energy
-            print(f"de = {de}\n")
-            print(5*"=")
+    
+            if de < 0:
+                accept_prob = 1
+            elif self.t > self.tmin:
+                accept_prob = exp(-de / self.t)
+            else:
+                accept_prob = 0
 
-            if de < 0 or(self.t > 0 and random.random() < exp(-de/self.t)):
+            # if self.t <= 1e-5 or (-de / self.t) < max_argument: 
+            random_num = random.random()
+            if de < 0 or (self.t >= self.tmin and random_num < accept_prob):
+                print(f"Energies: {e_n} < {self.current_energy}\n")
+                print(f"Temperature: {self.t}\n")
+                print(f"Random: {random.random()}\n")
+                print(f"Probability: {accept_prob}\n")
+
                 self.current_energy = e_n
                 self.current_state = choosen_neighbor
-                self.accept+= 1
+                self.accept += 1
 
             if e_n < self.best_energy:
                 self.best_energy = e_n
@@ -107,7 +119,8 @@ class Simulated:
                     self.step,
                     self.t,
                     self.current_energy,
-                    self.best_energy
+                    self.best_energy,
+                    accept_prob
                 ]
             )
 
@@ -159,7 +172,6 @@ class Simulated:
                     np.random.randint(0, shape[2]))
         
         self.cube.array[first], self.cube.array[second] = self.cube.array[second], self.cube.array[first]
-        
         return self.cube
         
 

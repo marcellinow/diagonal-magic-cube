@@ -98,6 +98,7 @@ class Tensor:
         
         '''
         return np.array_equal(self.array,tensor.array)
+    
     def is_in_tensor(self, v):
         '''
         Function to check whether the value in the tensor or not
