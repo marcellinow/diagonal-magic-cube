@@ -81,14 +81,15 @@ class Simulated:
         while self.step <= self.step_max and self.t >= self.tmin:
             
             choosen_neighbor = self.move()
-            print(f"best_energy = {self.best_energy}\n")
-            print(f"current_energy = {self.current_energy}\n")
+            # print(f"best_energy = {self.best_energy}\n")
             e_n = choosen_neighbor.objective_function()
             if e_n < self.best_energy:
+                print(5*"=")
                 print(f"e_n = {e_n}\n")
     
             de = e_n - self.current_energy
             print(f"de = {de}\n")
+            print(5*"=")
 
             if de < 0 or(self.t > 0 and random.random() < exp(-de/self.t)):
                 self.current_energy = e_n
@@ -165,7 +166,7 @@ class Simulated:
         import matplotlib.pyplot as plt
         hist = np.array(self.hist)
         _, ax = plt.subplots(1, 1, figsize=(10, 5))
-        ax.plot(hist[:, 0], hist[:, 3], label='Best Energy')
+        ax.plot(hist[:, 0], hist[:, 3], label='Objective Function')
         ax.set_xlabel('Step')
         ax.set_ylabel('Energy')
         ax.legend()
