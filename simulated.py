@@ -80,13 +80,14 @@ class Simulated:
         while self.step <= self.step_max and self.t >= self.tmin:
             
             choosen_neighbor = self.move()
-
+            print(f"best_energy = {self.best_energy}\n")
+            print(f"current_energy = {self.current_energy}\n")
             e_n = choosen_neighbor.objective_function()
             if e_n < self.best_energy:
                 print(f"e_n = {e_n}\n")
     
             de = e_n - self.current_energy
-            # print(f"de = {de}\n")
+            print(f"de = {de}\n")
 
             if de < 0 or(self.t > 0 and random.random() < exp(-de/self.t)):
                 self.current_energy = e_n
@@ -114,8 +115,8 @@ class Simulated:
         print('+------------------------ RESULTS -------------------------+\n')
         # print(f'      opt.mode: {self.obj_func}')
         print(f'cooling sched.: {self.cooling_schedule}')
-        if self.damping != 1: print(f'       damping: {self.damping}\n')
-        else: print('\n')
+        # if self.damping != 1: print(f'       damping: {self.damping}\n')
+        # else: print('\n')
 
         print(f'  initial temp: {self.tmax}')
         print(f'    final temp: {self.t:0.6f}')

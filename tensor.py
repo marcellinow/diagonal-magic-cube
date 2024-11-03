@@ -172,8 +172,13 @@ class Tensor:
 
         # Main Diagonal
         for k in range(n):
-            diag_sum_right = np.sum(self.array[k,k,k])
-            diag_sum_left = np.sum(self.array[k,k,n-1-k])
-            Z += ((diag_sum_right + diag_sum_left) - MC) ** 2
+            diag_sum_first = np.sum(self.array[k,k,k])
+            diag_sum_second = np.sum(self.array[k,k,n-1-k])
+            diag_sum_third = np.sum(self.array[k,n-1-k,k])
+            diag_sum_fourth = np.sum(self.array[n-1-k,k,k])
+            Z += ((diag_sum_first) - MC) ** 2
+            Z += ((diag_sum_second) - MC) ** 2
+            Z += ((diag_sum_third) - MC) ** 2
+            Z += ((diag_sum_fourth) - MC) ** 2
 
         return Z
