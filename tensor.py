@@ -92,7 +92,12 @@ class Tensor:
             plt.title(f"{title} - Level {h + 1}")
             plt.show()
 
-
+    def same_tensor(self,tensor):
+        '''
+        Function to check whether the tensor is same or not
+        
+        '''
+        return np.array_equal(self.array,tensor.array)
     def is_in_tensor(self, v):
         '''
         Function to check whether the value in the tensor or not
@@ -159,6 +164,8 @@ class Tensor:
                 level_sum = np.sum(self.array[:,i,j])
                 Z += (level_sum - MC) ** 2
 
+                # print(f"Row sum at ({i},{j}): {row_sum}, Column sum at ({i},{j}): {col_sum}, Level sum at ({i},{j}): {level_sum}")
+
 
         # Main Diagonal
         for k in range(n):
@@ -170,5 +177,6 @@ class Tensor:
             Z += ((diag_sum_second) - MC) ** 2
             Z += ((diag_sum_third) - MC) ** 2
             Z += ((diag_sum_fourth) - MC) ** 2
+            # print(f"Main diagonal sums: {diag_sum_first}, {diag_sum_second}, {diag_sum_third}, {diag_sum_fourth}")
 
         return Z

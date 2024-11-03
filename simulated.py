@@ -77,10 +77,12 @@ class Simulated:
 
         self.step = 1
         self.accept = 0
+        print(f"Initial State: {self.current_state}\n")
 
         while self.step <= self.step_max and self.t >= self.tmin:
             
             choosen_neighbor = self.move()
+            print(f"choosen_neighbor = {choosen_neighbor.array}\n")
             # print(f"best_energy = {self.best_energy}\n")
             e_n = choosen_neighbor.objective_function()
             if e_n < self.best_energy:
@@ -93,12 +95,12 @@ class Simulated:
 
             if de < 0 or(self.t > 0 and random.random() < exp(-de/self.t)):
                 self.current_energy = e_n
-                self.current_state = choosen_neighbor.array
+                self.current_state = choosen_neighbor
                 self.accept+= 1
 
             if e_n < self.best_energy:
                 self.best_energy = e_n
-                self.best_state = choosen_neighbor.array
+                self.best_state = choosen_neighbor
 
             self.hist.append(
                 [
