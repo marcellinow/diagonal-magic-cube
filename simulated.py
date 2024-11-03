@@ -173,16 +173,13 @@ class Simulated:
         return self.cube
         
 
-    # def move(self):
-    #     perturbation = np.random.normal(0, self.damping, size=self.current_state.shape) * self.t
-    #     perturbation = np.clip(perturbation,0,125)
-    #     perturbation = np.round(perturbation).astype(int)
-    #     neighbor = self.current_state + perturbation
-    #     print(f"neighbor: {neighbor}\n")
-
-    #     print(f"neighbor shape = {neighbor.shape}")
-    #     for i in range(len(neighbor)):
-    #         print(f"i = {i}")
-    #         min_bound, max_bound = self.bounds[i]
-    #         neighbor[i] = min(max(neighbor[i],min_bound),max_bound)
-    #     return neighbor
+    # Hist Plot
+    def hist_plot(self):
+        import matplotlib.pyplot as plt
+        hist = np.array(self.hist)
+        fig, ax = plt.subplots(1, 1, figsize=(10, 5))
+        ax.plot(hist[:, 0], hist[:, 3], label='Best Energy')
+        ax.set_xlabel('Step')
+        ax.set_ylabel('Energy')
+        ax.legend()
+        plt.show()

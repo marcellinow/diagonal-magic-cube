@@ -60,16 +60,6 @@ class Tensor:
                 for c in range(self.c):
                     ax.text(r,c,h,f"{self.array[h][r][c]}",ha="center",va="center",fontsize=14,color="blue")
                     ax.scatter(r,c,h,c="orange",s=500,edgecolors="k",alpha=0.4)
-
-        # for r in range(self.r):
-        #     for h in range(self.h):
-        #         ax.plot([r,r],[0,self.c-1],[h,h],color="black",linestyle="--")
-        # for c in range(self.c):
-        #     for h in range(self.h):
-        #         ax.plot([0,self.r-1],[c,c],[h,h],color="red",linestyle="--")
-        # for r in range(self.r):
-        #     for c in range(self.c):
-        #         ax.plot([r,r],[c,c],[0,self.h-1],color="cyan",linestyle="--")
             
         ax.set_xlabel("column-axis")
         ax.set_ylabel("row-axis")
