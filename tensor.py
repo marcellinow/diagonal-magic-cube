@@ -9,7 +9,7 @@ import numpy as np
 
 class Tensor:
 
-    def __init__(self,r,c,h):
+    def __init__(self,r,c,h,initial_array = None):
         '''
         Where
         r = row
@@ -20,20 +20,26 @@ class Tensor:
         self.r = r
         self.c = c
         self.h = h
+        self.shape = (r,c,h)
+
         
         # Auto make tensor  r x c x h   with rank h
         self.array = []
 
         # Inialize the tensor with value 0
+        if initial_array is not None:
+            self.array = np.array(initial_array)
+        else:
+            for _ in range(h):
+                h_array = []
+                for _ in range(r):
+                    j_array = [0] * c
+                    h_array.append(j_array)
+                self.array.append(h_array)
+            self.array = np.array(self.array)
 
-        for _ in range(h):
-            h_array = []
-            for j in range(r):
-                j_array = [0] * c
-                h_array.append(j_array)
-            self.array.append(h_array)
-        self.array = np.array(self.array)
-
+        # state
+        self.current_state = self.array
 
     def print_tensor(self):
         level = self.h

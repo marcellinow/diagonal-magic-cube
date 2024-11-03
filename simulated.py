@@ -14,12 +14,11 @@ import numpy as np
 from math import exp
 
 class Simulated:
-
-    def __init__(self,initial_state,obj_func,tmin=0,tmax=100,cooling_schedule='linear',alpha = None,step_max = 1000,bounds = [],damping = 1):
+    def __init__(self,cube,tmin=0,tmax=100,cooling_schedule='linear',alpha = None,step_max = 1000,bounds = [],damping = 1):
         '''
         parameters:
         - intial_state -> give the initial state of the problem space
-        - obj_func -> the objective function 
+    
         - tmin -> temperature for lower bound
         - tmax -> temperature for upper bound
         - cooling_schedule -> how we want the cooling (either linear or quadratic)
@@ -41,17 +40,17 @@ class Simulated:
         self.cooling_schedule = cooling_schedule
         self.step_max = step_max
 
-        
-        self.obj_func = obj_func
+        self.cube = cube
+        self.obj_func = self.cube.objective_function()
         self.damping = damping
         self.bounds = bounds[:]
 
-        self.current_state = initial_state
+        self.current_state = cube.current_state
         self.best_state = self.current_state
-        self.current_energy = obj_func(self.current_state)
+        self.current_energy = self.obj_func
         self.best_energy = self.current_energy
 
-        self.get_neighbor = self.move
+        print(f"Initial Energy: {self.current_energy}\n")
 
         if self.cooling_schedule == 'linear':
             if alpha != None:
@@ -78,21 +77,25 @@ class Simulated:
         self.step = 1
         self.accept = 0
 
-        while self.step <= self.step_max and self.t >= self.tmin and self.t >= 0:
+        while self.step <= self.step_max and self.t >= self.tmin:
             
-            choosen_neighbor = self.get_neighbor()
+            choosen_neighbor = self.move()
 
-            e_n = self.obj_func(choosen_neighbor)
+            e_n = choosen_neighbor.objective_function()
+            if e_n < self.best_energy:
+                print(f"e_n = {e_n}\n")
+    
             de = e_n - self.current_energy
+            # print(f"de = {de}\n")
 
-            if random() < exp(-de/self.t):
+            if de < 0 or(self.t > 0 and random.random() < exp(-de/self.t)):
                 self.current_energy = e_n
-                self.current_state = choosen_neighbor[:]
+                self.current_state = choosen_neighbor.array
                 self.accept+= 1
 
             if e_n < self.best_energy:
                 self.best_energy = e_n
-                self.best_state = choosen_neighbor[:]
+                self.best_state = choosen_neighbor.array
 
             self.hist.append(
                 [
@@ -109,7 +112,7 @@ class Simulated:
     
     def results(self):
         print('+------------------------ RESULTS -------------------------+\n')
-        print(f'      opt.mode: {self.obj_func.__name__}')
+        # print(f'      opt.mode: {self.obj_func}')
         print(f'cooling sched.: {self.cooling_schedule}')
         if self.damping != 1: print(f'       damping: {self.damping}\n')
         else: print('\n')
@@ -137,14 +140,37 @@ class Simulated:
     def cooling_quadratic_m(self,step):
         return self.tmin + (self.tmax - self.tmin) * (((self.step_max - step)/self.step_max)**2)
 
-
-
     # Move Function
     def move(self):
-        perturbation = np.random.normal(0,self.damping,size=self.current_state) * self.t
-        neighbor = self.current_state + perturbation
+        shape = self.cube.shape
 
-        for i in range(len(neighbor)):
-            min_bound, max_bound = self.bounds[i]
-            neighbor[i] = min(max(neighbor[i],min_bound),max_bound)
-        return neighbor
+        first = (np.random.randint(0, shape[0]), 
+                np.random.randint(0, shape[1]), 
+                np.random.randint(0, shape[2]))
+        second = first
+        while second == first:
+            second = (np.random.randint(0, shape[0]), 
+                    np.random.randint(0, shape[1]), 
+                    np.random.randint(0, shape[2]))
+        
+        # Swap the elements at the two selected positions
+        temp = self.cube.array[first]
+        self.cube.array[first] = self.cube.array[second]
+        self.cube.array[second] = temp
+        
+        return self.cube
+        
+
+    # def move(self):
+    #     perturbation = np.random.normal(0, self.damping, size=self.current_state.shape) * self.t
+    #     perturbation = np.clip(perturbation,0,125)
+    #     perturbation = np.round(perturbation).astype(int)
+    #     neighbor = self.current_state + perturbation
+    #     print(f"neighbor: {neighbor}\n")
+
+    #     print(f"neighbor shape = {neighbor.shape}")
+    #     for i in range(len(neighbor)):
+    #         print(f"i = {i}")
+    #         min_bound, max_bound = self.bounds[i]
+    #         neighbor[i] = min(max(neighbor[i],min_bound),max_bound)
+    #     return neighbor
