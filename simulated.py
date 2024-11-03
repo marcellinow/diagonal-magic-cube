@@ -134,13 +134,11 @@ class Simulated:
     
     def cooling_linear_m(self,step):
         return self.tmax - self.alpha * step
-    # def cooling_linear_m(self, step):
-    #     return self.t_max /  (1 + self.alpha * step)
-    
-    def cooling_quadratic_a(self,step):
-        return self.tmax / (1 + self.alpha * (step ** 2))
     
     def cooling_quadratic_m(self,step):
+        return self.tmax / (1 + self.alpha * (step ** 2))
+    
+    def cooling_quadratic_a(self,step):
         return self.tmin + (self.tmax - self.tmin) * (((self.step_max - step)/self.step_max)**2)
 
     # Move Function
@@ -165,7 +163,7 @@ class Simulated:
 
             original_value = self.cube.array[position]
 
-            perturbation = np.random.normal(0, self.damping) * (self.t)
+            perturbation = np.random.normal(0, self.damping) * (self.t/self.tmax)
             new_value = original_value + perturbation
 
             self.cube.array[position] = np.clip(new_value, 0, 125)
@@ -177,7 +175,7 @@ class Simulated:
     def hist_plot(self):
         import matplotlib.pyplot as plt
         hist = np.array(self.hist)
-        fig, ax = plt.subplots(1, 1, figsize=(10, 5))
+        _, ax = plt.subplots(1, 1, figsize=(10, 5))
         ax.plot(hist[:, 0], hist[:, 3], label='Best Energy')
         ax.set_xlabel('Step')
         ax.set_ylabel('Energy')
