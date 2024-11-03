@@ -144,29 +144,18 @@ class Simulated:
     # Move Function
     def move(self):
         shape = self.cube.shape
-        low_t = 0.1 * self.tmax
-        if self.t > low_t:
-            first = (np.random.randint(0, shape[0]), 
+        # low_t = 0.1 * self.tmax
+        
+        first = (np.random.randint(0, shape[0]), 
+                np.random.randint(0, shape[1]), 
+                np.random.randint(0, shape[2]))
+        second = first
+        while second == first:
+            second = (np.random.randint(0, shape[0]), 
                     np.random.randint(0, shape[1]), 
                     np.random.randint(0, shape[2]))
-            second = first
-            while second == first:
-                second = (np.random.randint(0, shape[0]), 
-                        np.random.randint(0, shape[1]), 
-                        np.random.randint(0, shape[2]))
-            
-            self.cube.array[first], self.cube.array[second] = self.cube.array[second], self.cube.array[first]
-        else:
-            position = (np.random.randint(0, shape[0]), 
-                    np.random.randint(0, shape[1]), 
-                    np.random.randint(0, shape[2]))
-
-            original_value = self.cube.array[position]
-
-            perturbation = np.random.normal(0, self.damping) * (self.t/self.tmax)
-            new_value = original_value + perturbation
-
-            self.cube.array[position] = np.clip(new_value, 0, 125)
+        
+        self.cube.array[first], self.cube.array[second] = self.cube.array[second], self.cube.array[first]
         
         return self.cube
         
