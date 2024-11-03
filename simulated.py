@@ -55,7 +55,7 @@ class Simulated:
 
         if self.cooling_schedule == 'linear':
             if alpha != None:
-                # self.update_t = self.cooling_linear_m
+                self.update_t = self.cooling_linear_m
                 self.cooling_schedule = 'linear multiplicative'
                 self.alpha = alpha
             

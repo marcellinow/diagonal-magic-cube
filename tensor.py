@@ -26,12 +26,13 @@ class Tensor:
 
         # Inialize the tensor with value 0
 
-        for i in range(h):
+        for _ in range(h):
             h_array = []
             for j in range(r):
                 j_array = [0] * c
                 h_array.append(j_array)
             self.array.append(h_array)
+        self.array = np.array(self.array)
 
 
     def print_tensor(self):
@@ -44,7 +45,34 @@ class Tensor:
             print()
 
     def plot_cube(self,title="Tensor Cube"):
+        fig = plt.figure(figsize=(15,15))
+        ax = fig.add_subplot(111,projection="3d")
+        ax.set_box_aspect([self.r, self.c, self.h])
+
         for h in range(self.h):
+            for r in range(self.r):
+                for c in range(self.c):
+                    ax.text(r,c,h,f"{self.array[h][r][c]}",ha="center",va="center",fontsize=14,color="blue")
+                    ax.scatter(r,c,h,c="orange",s=500,edgecolors="k",alpha=0.4)
+
+        # for r in range(self.r):
+        #     for h in range(self.h):
+        #         ax.plot([r,r],[0,self.c-1],[h,h],color="black",linestyle="--")
+        # for c in range(self.c):
+        #     for h in range(self.h):
+        #         ax.plot([0,self.r-1],[c,c],[h,h],color="red",linestyle="--")
+        # for r in range(self.r):
+        #     for c in range(self.c):
+        #         ax.plot([r,r],[c,c],[0,self.h-1],color="cyan",linestyle="--")
+            
+        ax.set_xlabel("column-axis")
+        ax.set_ylabel("row-axis")
+        ax.set_zlabel("level")
+        plt.title(title)
+        return plt.show()
+    
+    def plot_per_level(self,title="Tensor Cube"):
+         for h in range(self.h):
             fig = plt.figure(figsize=(8, 8))
             ax = fig.add_subplot(111, projection="3d")
             ax.set_box_aspect([self.r, self.c, 1])
@@ -56,10 +84,10 @@ class Tensor:
                     ax.scatter(r, c, 0, c="orange", s=500, edgecolors="k", alpha=0.4)
 
             # Add lines for cube structure on certain level
-            for r in range(self.r):
-                ax.plot([r, r], [0, self.c - 1], [0, 0], color="black", linestyle="--")
-            for c in range(self.c):
-                ax.plot([0, self.r - 1], [c, c], [0, 0], color="red", linestyle="--")
+            # for r in range(self.r):
+            #     ax.plot([r, r], [0, self.c - 1], [0, 0], color="black", linestyle="--")
+            # for c in range(self.c):
+            #     ax.plot([0, self.r - 1], [c, c], [0, 0], color="red", linestyle="--")
 
             # Labels and title
             ax.set_xlabel("Column-axis")
@@ -67,6 +95,7 @@ class Tensor:
             ax.set_zlabel("Level")
             plt.title(f"{title} - Level {h + 1}")
             plt.show()
+
 
     def is_in_tensor(self, v):
         '''
@@ -124,36 +153,21 @@ class Tensor:
         n = self.max_len()
         MC = self.magic_constant()
 
-        # Row
-        # print("--ROW--")
-        for level in range(n):
-            # print(f"Level: {level+1}\n")
-            for row in range(n):
-                # print(f"Row: {row+1}\n")
-                row_sum = np.sum(self.array[level][row][:])
-                # print(f"Row Sum: {row_sum}\n")
+        # Row, Column, and Level
+        for i in range(n):
+            for j in range(n):
+                row_sum = np.sum(self.array[i,j,:])
                 Z += (row_sum - MC) ** 2
-                # print(f"Z: {Z}\n")
-        # print("\n")
-        # print("--COLUMN--")
-        # Column
-        for level in range(n):
-            # print(f"Level: {level+1}\n")
-            for col in range(n):
-                # print(f"Column: {col+1}\n")
-                col_sum = np.sum(self.array[level][:][col])
-                # print(f"Col Sum: {col_sum}\n")
-                Z += (col_sum - MC) ** 2
-                # print(f"Z: {Z}\n")
+                col_sum = np.sum(self.array[i,:,j])
+                Z += (col_sum - MC) ** 2 
+                level_sum = np.sum(self.array[:,i,j])
+                Z += (level_sum - MC) ** 2
+
+
         # Main Diagonal
-        for level in range(n):
-            # print(f"Level: {level+1}\n")
-            for k in range(n):
-                diag_sum_right = np.sum(self.array[k][k])
-                # print(f"diag_sum_right: {diag_sum_right}\n")
-                diag_sum_left = np.sum(self.array[k][n-1])
-                # print(f"diag_sum_left: {diag_sum_left}\n")
-                Z += ((diag_sum_right + diag_sum_left) - MC) ** 2
-                # print(f"diag_sum: {diag_sum_left + diag_sum_right}\n")
+        for k in range(n):
+            diag_sum_right = np.sum(self.array[k,k,k])
+            diag_sum_left = np.sum(self.array[k,k,n-1-k])
+            Z += ((diag_sum_right + diag_sum_left) - MC) ** 2
 
         return Z
