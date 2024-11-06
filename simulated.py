@@ -82,9 +82,8 @@ class Simulated:
         self.accept = 0
         # print(f"Initial State: {self.current_state}\n")
 
-        while self.step <= self.step_max and self.t >= self.tmin:
-        # while self.t >= self.tmin:
-            
+        while self.t >= self.tmin:
+
             choosen_neighbor = self.move()
         
             e_n = choosen_neighbor.objective_function()
@@ -98,13 +97,12 @@ class Simulated:
             else:
                 accept_prob = 0
 
-            # if self.t <= 1e-5 or (-de / self.t) < max_argument: 
+            print(100*"=")
+            print(f"Step:{self.step}, Energy: {e_n}, Best Energy: {self.best_energy},Temperature: {self.t}\n")
+            print(100*"=")
+
             random_num = random.random()
             if de < 0 or (self.t >= self.tmin and random_num < accept_prob):
-                print(f"Energies: {e_n} < {self.current_energy}\n")
-                print(f"Temperature: {self.t}\n")
-                print(f"Random: {random.random()}\n")
-                print(f"Probability: {accept_prob}\n")
 
                 self.current_energy = e_n
                 self.current_state = choosen_neighbor

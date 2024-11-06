@@ -5,20 +5,16 @@ from math import exp
 from tensor import *
 
 class Random_restart:
-    def __init__(self,cube,bounds = [],damping = 1):
+    def __init__(self,cube):
         '''
         parameters:
         - intial_state -> give the initial state of the problem space
         '''
-
-        # Check Parameter
         
         # Initialization
         self.hist = []
         self.cube = cube
         self.obj_func = self.cube.objective_function()
-        self.damping = damping
-        self.bounds = bounds[:]
         self.done = False
         self.current_state = cube.current_state
         self.best_state = self.current_state
