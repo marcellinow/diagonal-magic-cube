@@ -127,7 +127,7 @@ class Tensor:
         '''
         n = self.max_len()
         n = n ** 3
-        
+
         for height in self.array:
             for row in height:
                 for col in range(len(row)):
@@ -136,7 +136,24 @@ class Tensor:
                         v = random.randint(1, n)
                     row[col] = v
         return self
-
+    
+    def randomize_value(self):
+        n = self.max_len() ** 3
+        shape = self.array.shape
+        num_swaps = n // 2
+        for _ in range(num_swaps):
+            first = (np.random.randint(0, shape[0]), 
+                    np.random.randint(0, shape[1]), 
+                    np.random.randint(0, shape[2]))
+            second = first
+            while second == first:
+                second = (np.random.randint(0, shape[0]), 
+                        np.random.randint(0, shape[1]), 
+                        np.random.randint(0, shape[2])) 
+            self.array[first], self.array[second] = self.array[second], self.array[first]
+        return self
+                    
+                    
 
     '''
     Magic Cube Functions

@@ -13,9 +13,10 @@ import random
 import numpy as np
 from math import exp
 from tensor import *
+import copy
 
 class Simulated:
-    def __init__(self,cube,tmin=0,tmax=100,cooling_schedule='linear',alpha = None,step_max = 1000,bounds = [],damping = 1):
+    def __init__(self,cube,tmin=0,tmax=100,cooling_schedule='linear',alpha = None,step_max = 1000):
         '''
         parameters:
         - intial_state -> give the initial state of the problem space
@@ -25,9 +26,6 @@ class Simulated:
         - cooling_schedule -> how we want the cooling (either linear or quadratic)
         - alpha -> hyperparamater for cooling schedule
         - step_max -> limitation step that agent can take
-        - bounds -> lower and upper bound for variable in objective function
-        - damping -> magnitude how much change agent want
-        
         '''
 
         # Check Parameter
@@ -43,10 +41,8 @@ class Simulated:
 
         self.cube = cube
         self.obj_func = self.cube.objective_function()
-        self.damping = damping
-        self.bounds = bounds[:]
 
-        self.current_state = cube.current_state
+        self.current_state = copy.deepcopy(self.cube).current_state
         self.best_state = self.current_state
         self.current_energy = self.obj_func
         self.best_energy = self.current_energy
@@ -82,7 +78,7 @@ class Simulated:
         self.accept = 0
         # print(f"Initial State: {self.current_state}\n")
 
-        while self.t >= self.tmin:
+        while self.t >= self.tmin and self.step <=self.step_max:
 
             choosen_neighbor = self.move()
         
@@ -135,8 +131,8 @@ class Simulated:
         # else: print('\n')
 
         print(f'  initial temp: {self.tmax}')
-        print(f'    final temp: {self.t:0.6f}')
-        print(f'     max steps: {self.step_max}')
+        print(f'    final temp: {self.t}')
+        # print(f'     max steps: {self.step_max}')
         print(f'    final step: {self.step}\n')
 
         print(f'  final energy: {self.best_energy:0.6f}\n')
