@@ -112,7 +112,7 @@ class Simulated:
                 [
                     self.step,
                     self.t,
-                    self.current_energy,
+                    e_n,
                     self.best_energy,
                     accept_prob
                 ]
@@ -174,7 +174,8 @@ class Simulated:
         import matplotlib.pyplot as plt
         hist = np.array(self.hist)
         _, ax = plt.subplots(1, 1, figsize=(10, 5))
-        ax.plot(hist[:, 0], hist[:, 3], label='Objective Function')
+        ax.plot(hist[:, 0], hist[:, 2],linestyle='-', label='Current Energy')
+        ax.plot(hist[:, 0], hist[:, 3],linestyle='-', label='Best Energy')
         ax.set_xlabel('Step')
         ax.set_ylabel('Energy')
         ax.legend()
