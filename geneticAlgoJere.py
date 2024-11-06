@@ -35,24 +35,26 @@ class GeneticAlgo:
         parent2 = self.population[1]
 
         # Crossover
-        child = self.crossover(parent1, parent2)
+        child1, child2 = self.crossover(parent1, parent2)
 
-        
         self.fitness = []
         self.best_cube = None
         self.best_fitness = 0
 
     def sort_population_by_fitness(self):
-        self.population.sort(key=lambda tensor: tensor.objective_function(), reverse=True)
+        self.population.sort(key=lambda tensor: tensor.objective_function(), reverse=False)
 
     def crossover(self, parent1, parent2):
-        child = Tensor(parent1.r, parent1.c, parent1.h)
-        for i in range(parent1.r):
-            for j in range(parent1.c):
-                for k in range(parent1.h):
-                    if random.random() < 0.5:
-                        child.array[i][j][k] = parent1.array[i][j][k]
-                    else:
-                        child.array[i][j][k] = parent2.array[i][j][k]
-        return child
+        child1 = Tensor(parent1.r, parent1.c, parent1.h)
+        child2 = Tensor(parent2.r, parent2.c, parent2.h)
+        child1.array = np.copy(parent1.array)
+        child2.array = np.copy(parent2.array)
+
+        row = random.randint(0, parent1.r - 1)
+        col = random.randint(0, parent1.c - 1)
+        height = random.randint(0, parent1.h - 1)
+
+        child1.array[row, col, height], child2.array[row, col, height] = parent2.array[row, col, height], parent1.array[row, col, height]
+
+        return child1, child2
         
