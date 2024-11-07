@@ -171,6 +171,19 @@ class Tensor:
         return  3 * n ** 2 + 6* n + 4
     
     def objective_function(self):
+        '''
+        1. Summation of all rows in each level = MC V
+        2. Summation of all columns in each level = MC V
+        3. Sumation of the main diagonal in each level = MC V
+        4. Summation of the pandiagonal in each level = MC V
+        5. Summation all pillars through levels = MC V
+        6. Summation of all the diagonals from left to right through the levels = MC
+        7. Summation of all the diagonals from right to left through the levels = MC
+        8. Summation of all the diagonals from up to down through the levels = MC
+        9. Summation of all the diagonals from down to up through the levels = MC
+        10. Summation of the space diagonal through levels = MC
+        
+        '''
         Z = 0
         n = self.max_len()
         MC = self.magic_constant()
@@ -179,32 +192,47 @@ class Tensor:
         for i in range(n):
             for j in range(n):
                 row_sum = np.sum(self.array[i,j,:])
+                # print(f"row: {self.array[i,j,:]}\n")
                 Z += (row_sum - MC) ** 2
                 col_sum = np.sum(self.array[i,:,j])
+                # print(f"col: {self.array[i,:,j]}\n")
                 Z += (col_sum - MC) ** 2 
-                level_sum = np.sum(self.array[:,i,j])
-                Z += (level_sum - MC) ** 2
+                # print(f"pillar: {self.array[:,i,j]}\n")
+                pillar_sum = np.sum(self.array[:,i,j])
+                Z += (pillar_sum - MC) ** 2
 
                 # print(f"Row sum at ({i},{j}): {row_sum}, Column sum at ({i},{j}): {col_sum}, Level sum at ({i},{j}): {level_sum}")
 
         # Main Diagonal
-        for k in range(n):
-            diag_sum_first = np.sum(self.array[k,k,k])
-            diag_sum_second = np.sum(self.array[k,k,n-1-k])
-            diag_sum_third = np.sum(self.array[k,n-1-k,k])
-            diag_sum_fourth = np.sum(self.array[n-1-k,k,k])
-            Z += ((diag_sum_first + diag_sum_second+diag_sum_third+diag_sum_fourth) - MC) ** 2
-            # print(f"diag_sum_first: {diag_sum_first}, diag_sum_second: {diag_sum_second}, diag_sum_third: {diag_sum_third}, diag_sum_fourth: {diag_sum_fourth}\n")
-            # print(f"Level {k+1}:")
-            # print(f"(k,k,k): {self.array[k,k,k]} ")
-            # print(f"  diag_sum_first (k, k, k): {diag_sum_first}")
-            # print(f"(k,k,n-1-k): {self.array[k,k,n-1-k]}\n")
-            # print(f"  diag_sum_second (k, k, n-1-k): {diag_sum_second}")
-            # print(f"(k,n-1-k,k): {self.array[k,n-1-k,k]}\n")
-            # print(f"  diag_sum_third (k, n-1-k, k): {diag_sum_third}")
-            # print(f"(n-1-k,k,k): {self.array[n-1-k,k,k]}\n")
-            # print(f"  diag_sum_fourth (n-1-k, k, k): {diag_sum_fourth}")
-            # print(f"  Total diagonal sum at level {k+1}: {diag_sum_first + diag_sum_second + diag_sum_third + diag_sum_fourth}")
-            # print(f"  Squared difference from magic constant: {((diag_sum_first + diag_sum_second + diag_sum_third + diag_sum_fourth) - MC) ** 2}")
-            print("\n")
+        for n in range(self.h):
+            main_diagonal = 0
+            # print(f"LEVEL {n}\n")
+            for i in range(self.r):
+                # print(f"element at ({n},{i},{i}): {self.array[n,i,i]}\n")
+                # print(f"element at ({n},{i},{self.h-1-i}): {self.array[n,i,self.h-1-i]}\n")
+                main_diagonal += self.array[n, i, i] - self.array[n, i, self.h - 1 - i]
+            Z += (main_diagonal - MC) ** 2
+
+        # Pandiagonals
+        # manuall for life :)
+        for height in range(self.h):
+            level = self.array[height]
+            pandiagonals = [
+                [level[0,1],level[1,2],level[2,3],level[3,4],level[4,0]],
+                [level[0,2],level[1,3],level[2,4],level[3,0],level[4,1]],
+                [level[0,3],level[1,4],level[2,0],level[3,1],level[4,2]],
+                [level[0,4],level[1,0],level[2,1],level[3,2],level[4,3]],
+                [level[1,4],level[2,3],level[3,2],level[4,1],level[0,0]],
+                [level[2,4],level[3,3],level[4,2],level[0,1],level[1,0]],
+                [level[3,4],level[4,3],level[0,2],level[1,1],level[2,0]],
+                [level[3,4],level[4,3],level[0,2],level[1,1],level[2,0]],
+                [level[4,4],level[0,3],level[1,2],level[2,1],level[3,0]]
+            ]
+            
+            for pandiagonal in pandiagonals:
+                sum = np.sum(pandiagonal)
+                Z += (sum - MC) ** 2
+            
+            # diag_sum_third = np.sum(self.array[k,n-1-k,k])
+            # diag_sum_fourth = np.sum(self.array[n-1-k,k,k])
         return Z

@@ -85,19 +85,20 @@ class Simulated:
             e_n = choosen_neighbor.objective_function()
     
             de = e_n - self.current_energy
-    
+
             if de < 0:
                 accept_prob = 1
             elif self.t > self.tmin:
                 accept_prob = exp(-de / self.t)
-            else:
-                accept_prob = 0
+            # else:
+            #     accept_prob = 0
 
-            # print(100*"=")
+            print(100*"=")
             print(f"Step:{self.step}, Energy: {e_n}, Best Energy: {self.best_energy},Temperature: {self.t}\n")
-            # print(100*"=")
+            print(100*"=")
 
             random_num = random.random()
+            print(f"Random Number: {random_num}; Acceptance Probability: {accept_prob}\n")
             if de < 0 or (self.t >= self.tmin and random_num < accept_prob):
 
                 self.current_energy = e_n
@@ -155,7 +156,6 @@ class Simulated:
     def move(self):
         shape = self.cube.shape
         # low_t = 0.1 * self.tmax
-        
         first = (np.random.randint(0, shape[0]), 
                 np.random.randint(0, shape[1]), 
                 np.random.randint(0, shape[2]))
@@ -173,7 +173,7 @@ class Simulated:
     def hist_plot(self):
         import matplotlib.pyplot as plt
         hist = np.array(self.hist)
-        _, ax = plt.subplots(1, 1, figsize=(10, 5))
+        _, ax = plt.subplots(1, 1, figsize=(20, 5))
         # ax.plot(hist[:, 0], hist[:, 2],linestyle='-', label='Current Energy')
         ax.plot(hist[:, 0], hist[:, 3],linestyle='-', label='Best Energy')
         ax.set_xlabel('Step')
