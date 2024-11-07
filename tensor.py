@@ -94,10 +94,10 @@ class Tensor:
         if self.shape != tensor.shape:
             return False
         
-        for i in self.h:
-            for j in self.r:
-                for k in self.c:
-                    if self.array[i,j,k] != tensor.array[i,j,k]:
+        for heigth in range(self.h):
+            for row in range(self.r):
+                for col in range(self.c):
+                    if self.array[heigth,row,col] != tensor.array[heigth,row,col]:
                         return False
         return True
                             
@@ -194,5 +194,17 @@ class Tensor:
             diag_sum_third = np.sum(self.array[k,n-1-k,k])
             diag_sum_fourth = np.sum(self.array[n-1-k,k,k])
             Z += ((diag_sum_first + diag_sum_second+diag_sum_third+diag_sum_fourth) - MC) ** 2
-
+            # print(f"diag_sum_first: {diag_sum_first}, diag_sum_second: {diag_sum_second}, diag_sum_third: {diag_sum_third}, diag_sum_fourth: {diag_sum_fourth}\n")
+            # print(f"Level {k+1}:")
+            # print(f"(k,k,k): {self.array[k,k,k]} ")
+            # print(f"  diag_sum_first (k, k, k): {diag_sum_first}")
+            # print(f"(k,k,n-1-k): {self.array[k,k,n-1-k]}\n")
+            # print(f"  diag_sum_second (k, k, n-1-k): {diag_sum_second}")
+            # print(f"(k,n-1-k,k): {self.array[k,n-1-k,k]}\n")
+            # print(f"  diag_sum_third (k, n-1-k, k): {diag_sum_third}")
+            # print(f"(n-1-k,k,k): {self.array[n-1-k,k,k]}\n")
+            # print(f"  diag_sum_fourth (n-1-k, k, k): {diag_sum_fourth}")
+            # print(f"  Total diagonal sum at level {k+1}: {diag_sum_first + diag_sum_second + diag_sum_third + diag_sum_fourth}")
+            # print(f"  Squared difference from magic constant: {((diag_sum_first + diag_sum_second + diag_sum_third + diag_sum_fourth) - MC) ** 2}")
+            print("\n")
         return Z
