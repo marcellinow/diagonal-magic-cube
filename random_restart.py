@@ -33,6 +33,7 @@ class Random_restart:
         print(f"Initial Value: {self.current_value}\n")
 
         for i in range(self.max_restart):
+            print(f"Restart: {i+1}\n")
             self.local_optimum = find_local_optimum(self.current_state)
             self.local_optimum_value = self.local_optimum.best_value
 
@@ -49,9 +50,11 @@ class Random_restart:
                     self.best_value
                 ]
                 )
-            
+            print(f"Iteration Value: {self.local_optimum_value}\n")
+            print(f"Best Value: {self.best_value}\n")
             self.iteration += 1
-        print(f"Best Value: {self.best_value}\n")
+        
+        print(f"Final Value: {self.best_value}\n")
 
 
 
