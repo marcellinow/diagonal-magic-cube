@@ -81,14 +81,24 @@ class Simulated:
         while self.t >= self.tmin and self.step <=self.step_max:
 
             choosen_neighbor = self.move()
-        
             e_n = choosen_neighbor.objective_function()
-    
-            de = e_n - self.current_energy
+
+            if e_n < self.best_energy:
+                de = e_n - self.current_energy
+            else:
+                limitation = 200
+                i = 0
+                while i < limitation and e_n > self.current_energy:
+                    choosen_neighbor = self.move()
+                    e_n = choosen_neighbor.objective_function()
+                    i+=1
+                de = e_n - self.current_energy
+
 
             if de < 0:
                 accept_prob = 1
             elif self.t > self.tmin:
+                # print(f"ke sini!\n")
                 accept_prob = exp(-de / self.t)
             # else:
             #     accept_prob = 0
@@ -98,7 +108,7 @@ class Simulated:
             print(100*"=")
 
             random_num = random.random()
-            print(f"Random Number: {random_num}; Acceptance Probability: {accept_prob}\n")
+            # print(f"Random Number: {random_num}; Acceptance Probability: {accept_prob}\n")
             if de < 0 or (self.t >= self.tmin and random_num < accept_prob):
 
                 self.current_energy = e_n
@@ -174,8 +184,8 @@ class Simulated:
         import matplotlib.pyplot as plt
         hist = np.array(self.hist)
         _, ax = plt.subplots(1, 1, figsize=(20, 5))
-        # ax.plot(hist[:, 0], hist[:, 2],linestyle='-', label='Current Energy')
-        ax.plot(hist[:, 0], hist[:, 3],linestyle='-', label='Best Energy')
+        ax.plot(hist[:, 0], hist[:, 2],linestyle='-', label='Current Energy')
+        # ax.plot(hist[:, 0], hist[:, 3],linestyle='-', label='Best Energy')
         ax.set_xlabel('Step')
         ax.set_ylabel('Energy')
         ax.legend()
