@@ -93,9 +93,9 @@ class Simulated:
             else:
                 accept_prob = 0
 
-            print(100*"=")
+            # print(100*"=")
             print(f"Step:{self.step}, Energy: {e_n}, Best Energy: {self.best_energy},Temperature: {self.t}\n")
-            print(100*"=")
+            # print(100*"=")
 
             random_num = random.random()
             if de < 0 or (self.t >= self.tmin and random_num < accept_prob):

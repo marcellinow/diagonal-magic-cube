@@ -79,12 +79,6 @@ class Tensor:
                     ax.text(r, c, 0, f"{self.array[h][r][c]}", ha="center", va="center", fontsize=14, color="blue")
                     ax.scatter(r, c, 0, c="orange", s=500, edgecolors="k", alpha=0.4)
 
-            # Add lines for cube structure on certain level
-            # for r in range(self.r):
-            #     ax.plot([r, r], [0, self.c - 1], [0, 0], color="black", linestyle="--")
-            # for c in range(self.c):
-            #     ax.plot([0, self.r - 1], [c, c], [0, 0], color="red", linestyle="--")
-
             # Labels and title
             ax.set_xlabel("Column-axis")
             ax.set_ylabel("Row-axis")
@@ -184,7 +178,6 @@ class Tensor:
 
                 # print(f"Row sum at ({i},{j}): {row_sum}, Column sum at ({i},{j}): {col_sum}, Level sum at ({i},{j}): {level_sum}")
 
-        print(100*"=")
         # Main Diagonal
         for k in range(n):
             diag_sum_first = np.sum(self.array[k,k,k])
@@ -192,6 +185,5 @@ class Tensor:
             diag_sum_third = np.sum(self.array[k,n-1-k,k])
             diag_sum_fourth = np.sum(self.array[n-1-k,k,k])
             Z += ((diag_sum_first + diag_sum_second+diag_sum_third+diag_sum_fourth) - MC) ** 2
-            # print(f"Main diagonal sums: {diag_sum_first + diag_sum_second+diag_sum_third+diag_sum_fourth}")
 
         return Z
