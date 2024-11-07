@@ -182,19 +182,16 @@ class Tensor:
                 level_sum = np.sum(self.array[:,i,j])
                 Z += (level_sum - MC) ** 2
 
-                print(f"Row sum at ({i},{j}): {row_sum}, Column sum at ({i},{j}): {col_sum}, Level sum at ({i},{j}): {level_sum}")
+                # print(f"Row sum at ({i},{j}): {row_sum}, Column sum at ({i},{j}): {col_sum}, Level sum at ({i},{j}): {level_sum}")
 
-
+        print(100*"=")
         # Main Diagonal
         for k in range(n):
             diag_sum_first = np.sum(self.array[k,k,k])
             diag_sum_second = np.sum(self.array[k,k,n-1-k])
             diag_sum_third = np.sum(self.array[k,n-1-k,k])
             diag_sum_fourth = np.sum(self.array[n-1-k,k,k])
-            Z += ((diag_sum_first) - MC) ** 2
-            Z += ((diag_sum_second) - MC) ** 2
-            Z += ((diag_sum_third) - MC) ** 2
-            Z += ((diag_sum_fourth) - MC) ** 2
-            # print(f"Main diagonal sums: {diag_sum_first}, {diag_sum_second}, {diag_sum_third}, {diag_sum_fourth}")
+            Z += ((diag_sum_first + diag_sum_second+diag_sum_third+diag_sum_fourth) - MC) ** 2
+            # print(f"Main diagonal sums: {diag_sum_first + diag_sum_second+diag_sum_third+diag_sum_fourth}")
 
         return Z
