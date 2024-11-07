@@ -91,7 +91,16 @@ class Tensor:
         Function to check whether the tensor is same or not
         
         '''
-        return np.array_equal(self.array,tensor.array)
+        if self.shape != tensor.shape:
+            return False
+        
+        for i in self.h:
+            for j in self.r:
+                for k in self.c:
+                    if self.array[i,j,k] != tensor.array[i,j,k]:
+                        return False
+        return True
+                            
     
     def is_in_tensor(self, v):
         '''
