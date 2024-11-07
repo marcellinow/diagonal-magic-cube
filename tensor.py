@@ -182,7 +182,7 @@ class Tensor:
                 level_sum = np.sum(self.array[:,i,j])
                 Z += (level_sum - MC) ** 2
 
-                # print(f"Row sum at ({i},{j}): {row_sum}, Column sum at ({i},{j}): {col_sum}, Level sum at ({i},{j}): {level_sum}")
+                print(f"Row sum at ({i},{j}): {row_sum}, Column sum at ({i},{j}): {col_sum}, Level sum at ({i},{j}): {level_sum}")
 
 
         # Main Diagonal
