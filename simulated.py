@@ -47,9 +47,6 @@ class Simulated:
         self.current_energy = self.obj_func
         self.best_energy = self.current_energy
 
-        # Heuristics Atributes
-        self.ideal_energy = 1278394.0
-
         print(f"Initial Energy: {self.current_energy}\n")
 
         if self.cooling_schedule == 'linear':
@@ -86,7 +83,7 @@ class Simulated:
             if e_n < self.best_energy:
                 de = e_n - self.current_energy
             else:
-                limitation = 200
+                limitation = 500
                 i = 0
                 while i < limitation and e_n > self.current_energy:
                     choosen_neighbor = self.move()
@@ -100,8 +97,6 @@ class Simulated:
             elif self.t > self.tmin:
                 # print(f"ke sini!\n")
                 accept_prob = exp(-de / self.t)
-            # else:
-            #     accept_prob = 0
 
             print(100*"=")
             print(f"Step:{self.step}, Energy: {e_n}, Best Energy: {self.best_energy},Temperature: {self.t}\n")
