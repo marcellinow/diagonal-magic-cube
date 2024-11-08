@@ -13,36 +13,79 @@ from math import exp
 from tensor import *
 
 class GeneticAlgo:
-    def __init__(self, cube, goal_cube, population_size, generation_rate, mutation_rate):
+    def __init__(self, cube, goal_cube, population_size, generation_rate):
         self.cube = cube
-        goal_cube = goal_cube
+        self.goal_cube = goal_cube
         self.population_size = population_size
         self.generation_rate = generation_rate
-        self.mutation_rate = mutation_rate
-        
-        # Population
         self.population = []
-        self.population.append(cube)
+        mutation_rate = 0.1
+        goal_fitness = 0
+        self.history = []
+
+        # Initial Population
+        print("Generating initial population...")
+        self.population.append(self.cube)
+        
         while len(self.population) < self.population_size:
-            new_cube = cube.initial_state(self.cube)
-            if not cube.same_tensor(new_cube):
-                self.population.append(new_cube)
-        self.sort_population_by_fitness(self)
+            # print(f"Current population size: {len(self.population)}")
+            new_cube = self.cube.randomize_value()
+            # print("Generated new cube")
+            # if all(not existing_cube.same_tensor(new_cube) for existing_cube in self.population):
+            self.population.append(new_cube)
+            # print("Added new cube to population")
+            # else:
+            #     print("Cube already exists in population")
+        print("Initial Population Generated with size: ", len(self.population))
+        self.sort_population_by_fitness(self.population)
+       
+        # Evolution
+        for i in range(self.generation_rate):
+            new_population = []
 
-        # Selection
-        self.population = self.population[:2]
-        parent1 = self.population[0]
-        parent2 = self.population[1]
+            # Selection
+            self.population = self.population[:2]
+            parent1 = self.population[0]
+            parent2 = self.population[1]
+            # print("Parent 1 Fitness: ", parent1.objective_function())
+            # print("Parent 2 Fitness: ", parent2.objective_function())
+            self.history.append(parent1)
 
-        # Crossover
-        child1, child2 = self.crossover(parent1, parent2)
+            while len(new_population) <= self.population_size:
+                # Crossover
+                child1, child2 = self.crossover(parent1, parent2)
 
-        self.fitness = []
-        self.best_cube = None
-        self.best_fitness = 0
+                # Mutation
+                if random.random() < mutation_rate:
+                    self.mutate(child1)
+                if random.random() < mutation_rate:
+                    self.mutate(child2)
 
-    def sort_population_by_fitness(self):
-        self.population.sort(key=lambda tensor: tensor.objective_function(), reverse=False)
+                # New Generation
+                # if all(not existing_cube.same_tensor(child1) for existing_cube in new_population):
+                new_population.append(child1)
+                if len(new_population) < self.population_size:
+                    # if all(not existing_cube.same_tensor(child2) for existing_cube in new_population):
+                     new_population.append(child2)
+                
+            self.sort_population_by_fitness(new_population)
+            best_solution = new_population[0]
+            self.history.append(best_solution)
+            if best_solution.objective_function() == goal_fitness:
+                break
+            else:
+                # Update Population
+                self.population = new_population
+
+            print("Generation: ", i+1, "Fitness: ", best_solution.objective_function())
+
+        # Final Solution
+        print("Best solution found:")
+        best_solution.print_tensor()
+        print("Fitness:", best_solution.objective_function())
+
+    def sort_population_by_fitness(self, population):
+        population.sort(key=lambda tensor: tensor.objective_function(), reverse=False)
 
     def crossover(self, parent1, parent2):
         child1 = Tensor(parent1.r, parent1.c, parent1.h)
@@ -57,4 +100,20 @@ class GeneticAlgo:
         child1.array[row, col, height], child2.array[row, col, height] = parent2.array[row, col, height], parent1.array[row, col, height]
 
         return child1, child2
-        
+    
+    def mutate(self, cube):
+        row = random.randint(0, cube.r - 1)
+        col = random.randint(0, cube.c - 1)
+        height = random.randint(0, cube.h - 1)
+        cube.array[row, col, height] = random.randint(0, 125)
+
+    def hist_plot(self):
+       fitness_values = [cube.objective_function() for cube in self.history]
+       plt.figure(figsize=(10, 5))
+       plt.plot(fitness_values, label='Best Fitness Over Generations')
+       plt.xlabel('Generation')
+       plt.ylabel('Fitness Value')
+       plt.title('Fitness Evolution Over Generations')
+       plt.legend()
+       plt.grid()
+       plt.show()
