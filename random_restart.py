@@ -70,26 +70,6 @@ class Random_restart:
         print(f'  final Value: {self.best_value:0.6f}\n')
         print('+-------------------------- END ---------------------------+')
 
-
-
-    # Move Function
-    def move(self):
-        shape = self.cube.shape
-        
-        first = (np.random.randint(0, shape[0]), 
-                np.random.randint(0, shape[1]), 
-                np.random.randint(0, shape[2]))
-        second = first
-        while second == first:
-            second = (np.random.randint(0, shape[0]), 
-                    np.random.randint(0, shape[1]), 
-                    np.random.randint(0, shape[2]))
-        
-        self.cube.array[first], self.cube.array[second] = self.cube.array[second], self.cube.array[first]
-        
-        return self.cube
-        
-
     # Hist Plot
     
     def hist_plot(self):

@@ -16,6 +16,7 @@ from tensor import *
 import matplotlib.pyplot as plt
 import copy
 import timeit
+import pandas as pd
 
 class Simulated:
     def __init__(self,cube,tmin=0,tmax=100,cooling_schedule='linear',alpha = None,step_max = 1000):
@@ -86,12 +87,13 @@ class Simulated:
 
             de = e_n - self.current_energy
 
-            if de < 0:
-                probability = 1
-            else:
-                probability = self.safe_exp(-de/self.t)
+            # if de < 0:
+            #     probability = 1
+            # else:
+            #     probability = self.safe_exp(-de/self.t)
 
             random_num = random.random()
+            probability = self.safe_exp(-de/self.t)
 
             print(100*"=")
             print(f"Step:{self.step}, Energy: {e_n}, Best Energy: {self.best_energy},Temperature: {self.t}, Probability: {probability}\n")
@@ -155,13 +157,11 @@ class Simulated:
             p1 = (np.random.randint(0, n), 
                     np.random.randint(0, n), 
                     np.random.randint(0, n))
-            
-            while True:
+            p2 = p1
+            while p2 == p1:
                 p2 = (np.random.randint(0, n), 
                         np.random.randint(0, n), 
                         np.random.randint(0, n))
-                if p2 != p1:
-                    break
             self.cube.array[p1], self.cube.array[p2] = self.cube.array[p2], self.cube.array[p1]
             temp_energy = self.cube.objective_function()
 
@@ -173,12 +173,15 @@ class Simulated:
         self.cube = best_neighbor
         return self.cube
     
-    # Safe Exponential to avoid Math Range error
+    # Safe Exponential 
     def safe_exp(self,x):
-        try:
-            return exp(x)
-        except:
-            return 0
+        '''
+        to avoid Math Range error
+        '''    
+        x = max(-700,min(700,x))
+        return exp(x)
+
+
 
     # Hist Plot
     def hist_plot(self, title=None, Curr_energy=True, Best_energy=True):
@@ -196,11 +199,14 @@ class Simulated:
         ax.legend()
         plt.show()
 
+
+
     def prob_plot(self,title=None):
         hist = np.array(self.hist)
         _, ax = plt.subplots(1, 1, figsize=(50, 10))
 
-        ax.plot(hist[:,0],hist[:,4],linestyle='-',label='Probability',color='green')
+        # ax.plot(hist[:,0],hist[:,4],linestyle='--',marker='.',label='Probability',color='green')
+        ax.plot(hist[:,0],hist[:,4],marker='.',linestyle='',label='Probability',color='green')
         ax.set_xlabel('Step')
         ax.set_ylabel('Probability')
         ax.set_title(title)
