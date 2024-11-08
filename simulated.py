@@ -15,6 +15,7 @@ from math import exp
 from tensor import *
 import matplotlib.pyplot as plt
 import copy
+import timeit
 
 class Simulated:
     def __init__(self,cube,tmin=0,tmax=100,cooling_schedule='linear',alpha = None,step_max = 1000):
@@ -42,6 +43,8 @@ class Simulated:
 
         self.cube = cube
         self.obj_func = self.cube.objective_function()
+
+        self.initial_state = copy.deepcopy(self.cube)
 
         self.current_state = copy.deepcopy(self.cube).current_state
         self.best_state = copy.deepcopy(self.current_state)
@@ -75,14 +78,14 @@ class Simulated:
         self.step = 1
         self.accept = 0
         # print(f"Initial State: {self.current_state}\n")
-
+        self.start_time = timeit.default_timer()
+        stuck_ctr = 0
         while self.t >= self.tmin and self.step < self.step_max and self.t > 0:
 
             choosen_neighbor = self.move()
             e_n = choosen_neighbor.objective_function()
 
             de = e_n - self.current_energy
-
 
             random_num = random.random()
             accept_prob = -de/self.t
@@ -111,22 +114,20 @@ class Simulated:
 
             self.t = self.update_t(self.step)
             self.step +=1
+        self.stop_time = timeit.default_timer()
         self.acceptance_rate = self.accept / self.step
     def final_state(self):
         return Tensor(5,5,5,self.best_state.array)
     def results(self):
         print('+------------------------ RESULTS -------------------------+\n')
-        # print(f'      opt.mode: {self.obj_func}')
-        print(f'cooling sched.: {self.cooling_schedule}')
-        # if self.damping != 1: print(f'       damping: {self.damping}\n')
-        # else: print('\n')
-
-        print(f'  initial temp: {self.tmax}')
+        print(f'    cooling sched.: {self.cooling_schedule}')
+        print(f'    initial temp: {self.tmax}')
         print(f'    final temp: {self.t}')
-        # print(f'     max steps: {self.step_max}')
         print(f'    final step: {self.step}\n')
-
-        print(f'  final energy: {self.best_energy:0.6f}\n')
+        print(f'    initial energy: {self.initial_state.objective_function():0.3f}')
+        print(f'    final energy: {self.best_energy:0.3f}\n')
+        print(f'    energy differences: {(self.initial_state.objective_function() - self.best_energy):0.3f}\n')
+        print(f'    runtime: {(self.stop_time - self.start_time):0.3f} seconds\n')
         print('+-------------------------- END ---------------------------+')
 
 
@@ -165,19 +166,28 @@ class Simulated:
             return 0
 
     # Hist Plot
-    def hist_plot(self,Curr_energy=True,Best_energy=True,Probability=True):
+    def hist_plot(self, title=None, Curr_energy=True, Best_energy=True):
         hist = np.array(self.hist)
         _, ax = plt.subplots(1, 1, figsize=(20, 5))
 
         if Curr_energy == True:
-            ax.plot(hist[:, 0], hist[:, 2],linestyle='-', label='Current Energy')
+            ax.plot(hist[:, 0], hist[:, 2],linestyle='-', label='Current Energy',color='grey')
         if Best_energy == True:
-            ax.plot(hist[:, 0], hist[:, 3],linestyle='-', label='Best Energy')
-        
-        if Probability == True:
-            ax.plot(hist[:, 0], hist[:, 4],linestyle='-', label='Probability')
+            ax.plot(hist[:, 0], hist[:, 3],linestyle='-', label='Best Energy',color='black')
 
         ax.set_xlabel('Step')
         ax.set_ylabel('Energy')
+        ax.set_title(title)
         ax.legend()
         plt.show()
+
+    def prob_plot(self,title=None):
+        hist = np.array(self.hist)
+        _, ax = plt.subplots(1, 1, figsize=(50, 10))
+
+        ax.plot(hist[:,0],hist[:,4],linestyle='-',label='Probability',color='green')
+        ax.set_xlabel('Step')
+        ax.set_ylabel('Probability')
+        ax.set_title(title)
+        ax.legend()
+        plt.show

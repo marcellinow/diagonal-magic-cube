@@ -44,7 +44,7 @@ class Tensor:
     def print_tensor(self):
         level = self.h
         for height in self.array:
-            print(f"Level: {len(height)-level+1}\n")
+            print(f"Level {len(height)-level+1}: \n")
             level = level - 1
             for row in height:
                 print(row)
@@ -172,16 +172,14 @@ class Tensor:
     
     def objective_function(self):
         '''
-        1. Summation of all rows in each level = MC V
-        2. Summation of all columns in each level = MC V
-        3. Sumation of the main diagonal in each level = MC V
-        4. Summation of the pandiagonal in each level = MC V
-        5. Summation all pillars through levels = MC V
-        6. Summation of all the diagonals from left to right through the levels = MC
-        7. Summation of all the diagonals from right to left through the levels = MC
-        8. Summation of all the diagonals from up to down through the levels = MC
-        9. Summation of all the diagonals from down to up through the levels = MC
-        10. Summation of the space diagonal through levels = MC
+        - Summation of all rows in each level = MC V
+        - Summation of all columns in each level = MC V
+        - Sumation of the main diagonal in each level = MC V
+        - Summation all pillars through levels = MC V
+        - Summation diagonal spaces from upper right to down left = MC V
+        - Summation diagonal spaces from upper left to down right = MC V
+        - Summation of all cols in each row = MC V
+        - Summation of all row in each col = MC V
         Reference:
         https://www.magischvierkant.com/three-dimensional-eng/magic-features
         '''
@@ -205,35 +203,40 @@ class Tensor:
                 # print(f"Row sum at ({i},{j}): {row_sum}, Column sum at ({i},{j}): {col_sum}, Level sum at ({i},{j}): {level_sum}")
 
         # Main Diagonal
-        for n in range(self.h):
-            main_diagonal = 0
-            # print(f"LEVEL {n}\n")
+        for level in range(self.h):
+            main_diagonal_left = 0
+            main_diagonal_right = 0
+            # print(f"LEVEL {level}\n")
             for i in range(self.r):
-                # print(f"element at ({n},{i},{i}): {self.array[n,i,i]}\n")
-                # print(f"element at ({n},{i},{self.h-1-i}): {self.array[n,i,self.h-1-i]}\n")
-                main_diagonal += self.array[n, i, i] - self.array[n, i, self.h - 1 - i]
-            Z += (main_diagonal - MC) ** 2
+                # print(f"element at ({level},{i},{i}): {self.array[level,i,i]}\n")
+                # print(f"element at ({level},{i},{self.h-1-i}): {self.array[level,i,self.h-1-i]}\n")
+                main_diagonal_left += self.array[level, i, i]
+                main_diagonal_right += self.array[level, i, self.h-1-i]
+            Z += (main_diagonal_left - MC) ** 2
+            Z += (main_diagonal_right - MC) ** 2
 
-        # Pandiagonals
-        # manuall for life :)
-        for height in range(self.h):
-            level = self.array[height]
-            pandiagonals = [
-                [level[0,1],level[1,2],level[2,3],level[3,4],level[4,0]],
-                [level[0,2],level[1,3],level[2,4],level[3,0],level[4,1]],
-                [level[0,3],level[1,4],level[2,0],level[3,1],level[4,2]],
-                [level[0,4],level[1,0],level[2,1],level[3,2],level[4,3]],
-                [level[1,4],level[2,3],level[3,2],level[4,1],level[0,0]],
-                [level[2,4],level[3,3],level[4,2],level[0,1],level[1,0]],
-                [level[3,4],level[4,3],level[0,2],level[1,1],level[2,0]],
-                [level[3,4],level[4,3],level[0,2],level[1,1],level[2,0]],
-                [level[4,4],level[0,3],level[1,2],level[2,1],level[3,0]]
-            ]
-            
-            for pandiagonal in pandiagonals:
-                sum = np.sum(pandiagonal)
-                Z += (sum - MC) ** 2
-            
-            # diag_sum_third = np.sum(self.array[k,n-1-k,k])
-            # diag_sum_fourth = np.sum(self.array[n-1-k,k,k])
+        # Diagonal Spaces
+        space_diagonal_left = 0
+        space_diagonal_right = 0
+        for i in range(self.max_len()):
+            # print(f"({self.h - (self.h - i)},{i},{i})\n")
+            # print(f"element : ({self.array[self.h - (self.h -i),i,i]})\n\n")
+            # print(f"({i},{i},{self.h - 1 - i})\n")
+            # print(f"element : ({self.array[i,i, self.h - 1 - i]})\n\n")
+            space_diagonal_left += self.array[self.h - (self.h - i),i,i]
+            space_diagonal_right += self.array[i,i, self.h - 1 - i]
+        Z += (space_diagonal_left - MC) ** 2
+        Z += (space_diagonal_right - MC) ** 2
+
+        # Space Summation 
+        for i in range(self.max_len()):
+            space_row = 0
+            space_col = 0
+            for j in range(self.max_len()):
+                # print(f"({self.h - (self.h - j)},{i},{self.c - (self.c - j)})\n")
+                # print(f"element : ({self.array[self.h - (self.h -j),i,self.c - (self.c - j)]})\n\n")
+                space_row += self.array[self.h - (self.h - j),i,self.c - (self.c - j)]
+                space_col += self.array[self.h - (self.h - j),self.r - (self.r - j),i]
+            Z += (space_row - MC) ** 2
+            Z += (space_col - MC) ** 2
         return Z
