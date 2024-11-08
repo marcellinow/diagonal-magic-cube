@@ -41,14 +41,13 @@ class Simulated:
         self.cooling_schedule = cooling_schedule
         self.step_max = step_max
 
-        self.cube = cube
-        self.obj_func = self.cube.objective_function()
+        self.cube = copy.deepcopy(cube)
+        self.current_energy = self.cube.objective_function()
 
         self.initial_state = copy.deepcopy(self.cube)
 
         self.current_state = copy.deepcopy(self.cube).current_state
         self.best_state = copy.deepcopy(self.current_state)
-        self.current_energy = self.obj_func
         self.best_energy = self.current_energy
 
         print(f"Initial Energy: {self.current_energy}\n")
@@ -93,7 +92,7 @@ class Simulated:
             print(100*"=")
             print(f"Step:{self.step}, Energy: {e_n}, Best Energy: {self.best_energy},Temperature: {self.t}, Probability: {probability}\n")
             print(100*"=")
-            if random_num < probability:
+            if random_num <= probability:
                 self.current_energy = e_n
                 self.current_state = copy.deepcopy(choosen_neighbor)
                 self.accept += 1
@@ -145,16 +144,18 @@ class Simulated:
 
     # Move Function
     def move(self):
-        shape = self.cube.shape
-        p1 = (np.random.randint(0, shape[0]), 
-                np.random.randint(0, shape[1]), 
-                np.random.randint(0, shape[2]))
+        shape = self.cube.max_len()
+        p1 = (np.random.randint(0, shape), 
+                np.random.randint(0, shape), 
+                np.random.randint(0, shape))
         p2 = p1
         while p2 == p1:
-            p2 = (np.random.randint(0, shape[0]), 
-                    np.random.randint(0, shape[1]), 
-                    np.random.randint(0, shape[2]))
-        
+            p2 = (np.random.randint(0, shape), 
+                    np.random.randint(0, shape), 
+                    np.random.randint(0, shape))
+        # print(40*"=")
+        # print(f"Substitutes ({self.cube.array[p1]}) with ({self.cube.array[p2]})\n")
+        # print(40*"=")
         self.cube.array[p1], self.cube.array[p2] = self.cube.array[p2], self.cube.array[p1]
         return self.cube
     
