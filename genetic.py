@@ -4,9 +4,8 @@ import matplotlib.pyplot as plt
 from tensor import *
 
 class GeneticAlgoNJ:
-    def __init__(self, cube, goal_cube, population_size, generation_rate, mutation_rate, elitism_size=10):
+    def __init__(self, cube, population_size, generation_rate, mutation_rate, elitism_size):
         self.cube = cube
-        self.goal_cube = goal_cube
         self.population_size = population_size
         self.generation_rate = generation_rate
         self.mutation_rate = mutation_rate
