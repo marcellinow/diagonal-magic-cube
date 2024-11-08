@@ -13,6 +13,7 @@ import random
 import numpy as np
 from math import exp
 from tensor import *
+import matplotlib.pyplot as plt
 import copy
 
 class Simulated:
@@ -75,44 +76,31 @@ class Simulated:
         self.accept = 0
         # print(f"Initial State: {self.current_state}\n")
 
-        while self.t >= self.tmin and self.step <=self.step_max:
+        while self.t >= self.tmin and self.step < self.step_max and self.t > 0:
 
             choosen_neighbor = self.move()
             e_n = choosen_neighbor.objective_function()
 
-            if e_n < self.best_energy:
-                de = e_n - self.current_energy
-            else:
-                limitation = 500
-                i = 0
-                while i < limitation and e_n > self.current_energy:
-                    choosen_neighbor = self.move()
-                    e_n = choosen_neighbor.objective_function()
-                    i+=1
-                de = e_n - self.current_energy
+            de = e_n - self.current_energy
 
-
-            if de < 0:
-                accept_prob = 1
-            elif self.t > self.tmin:
-                # print(f"ke sini!\n")
-                accept_prob = exp(-de / self.t)
+            
 
             print(100*"=")
             print(f"Step:{self.step}, Energy: {e_n}, Best Energy: {self.best_energy},Temperature: {self.t}\n")
             print(100*"=")
 
             random_num = random.random()
-            # print(f"Random Number: {random_num}; Acceptance Probability: {accept_prob}\n")
-            if de < 0 or (self.t >= self.tmin and random_num < accept_prob):
+            accept_prob = -de/self.t
+            probability = self.safe_exp(accept_prob)
+            if random_num < probability:
 
                 self.current_energy = e_n
-                self.current_state = choosen_neighbor
+                self.current_state = copy.deepcopy(choosen_neighbor)
                 self.accept += 1
 
             if e_n < self.best_energy:
                 self.best_energy = e_n
-                self.best_state = choosen_neighbor
+                self.best_state = copy.deepcopy(choosen_neighbor)
 
             self.hist.append(
                 [
@@ -120,7 +108,7 @@ class Simulated:
                     self.t,
                     e_n,
                     self.best_energy,
-                    accept_prob
+                    probability
                 ]
             )
 
@@ -128,7 +116,7 @@ class Simulated:
             self.step +=1
         self.acceptance_rate = self.accept / self.step
     def final_state(self):
-        return Tensor(5,5,5,self.best_state).print_tensor()
+        return Tensor(5,5,5,self.best_state.array)
     def results(self):
         print('+------------------------ RESULTS -------------------------+\n')
         # print(f'      opt.mode: {self.obj_func}')
@@ -172,15 +160,25 @@ class Simulated:
         
         self.cube.array[first], self.cube.array[second] = self.cube.array[second], self.cube.array[first]
         return self.cube
-        
+    # Safe Exponential to avoid Math Range error
+    def safe_exp(self,x):
+        try:
+            return exp(x)
+        except:
+            return 0
 
     # Hist Plot
-    def hist_plot(self):
-        import matplotlib.pyplot as plt
+    def hist_plot(self,curr_energy=True,Best_energy=True,Probability=True):
         hist = np.array(self.hist)
         _, ax = plt.subplots(1, 1, figsize=(20, 5))
-        ax.plot(hist[:, 0], hist[:, 2],linestyle='-', label='Current Energy')
-        # ax.plot(hist[:, 0], hist[:, 3],linestyle='-', label='Best Energy')
+        if curr_energy == True:
+            ax.plot(hist[:, 0], hist[:, 2],linestyle='-', label='Current Energy')
+        if Best_energy == True:
+            ax.plot(hist[:, 0], hist[:, 3],linestyle='-', label='Best Energy')
+        
+        if Probability == True:
+            ax.plot(hist[:, 0], hist[:, 4],linestyle='-', label='Probability')
+
         ax.set_xlabel('Step')
         ax.set_ylabel('Energy')
         ax.legend()

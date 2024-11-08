@@ -91,7 +91,7 @@ class Tensor:
         Function to check whether the tensor is same or not
         
         '''
-        if self.shape != tensor.shape:
+        if self.array.shape != tensor.array.shape:
             return False
         
         for heigth in range(self.h):
