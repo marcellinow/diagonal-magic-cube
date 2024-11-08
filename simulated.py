@@ -44,7 +44,7 @@ class Simulated:
         self.obj_func = self.cube.objective_function()
 
         self.current_state = copy.deepcopy(self.cube).current_state
-        self.best_state = self.current_state
+        self.best_state = copy.deepcopy(self.current_state)
         self.current_energy = self.obj_func
         self.best_energy = self.current_energy
 
@@ -83,17 +83,14 @@ class Simulated:
 
             de = e_n - self.current_energy
 
-            
-
-            print(100*"=")
-            print(f"Step:{self.step}, Energy: {e_n}, Best Energy: {self.best_energy},Temperature: {self.t}\n")
-            print(100*"=")
 
             random_num = random.random()
             accept_prob = -de/self.t
             probability = self.safe_exp(accept_prob)
+            print(100*"=")
+            print(f"Step:{self.step}, Energy: {e_n}, Best Energy: {self.best_energy},Temperature: {self.t}, Probability: {probability}\n")
+            print(100*"=")
             if random_num < probability:
-
                 self.current_energy = e_n
                 self.current_state = copy.deepcopy(choosen_neighbor)
                 self.accept += 1
@@ -148,18 +145,18 @@ class Simulated:
     # Move Function
     def move(self):
         shape = self.cube.shape
-        # low_t = 0.1 * self.tmax
-        first = (np.random.randint(0, shape[0]), 
+        p1 = (np.random.randint(0, shape[0]), 
                 np.random.randint(0, shape[1]), 
                 np.random.randint(0, shape[2]))
-        second = first
-        while second == first:
-            second = (np.random.randint(0, shape[0]), 
+        p2 = p1
+        while p2 == p1:
+            p2 = (np.random.randint(0, shape[0]), 
                     np.random.randint(0, shape[1]), 
                     np.random.randint(0, shape[2]))
         
-        self.cube.array[first], self.cube.array[second] = self.cube.array[second], self.cube.array[first]
+        self.cube.array[p1], self.cube.array[p2] = self.cube.array[p2], self.cube.array[p1]
         return self.cube
+    
     # Safe Exponential to avoid Math Range error
     def safe_exp(self,x):
         try:
@@ -168,10 +165,11 @@ class Simulated:
             return 0
 
     # Hist Plot
-    def hist_plot(self,curr_energy=True,Best_energy=True,Probability=True):
+    def hist_plot(self,Curr_energy=True,Best_energy=True,Probability=True):
         hist = np.array(self.hist)
         _, ax = plt.subplots(1, 1, figsize=(20, 5))
-        if curr_energy == True:
+
+        if Curr_energy == True:
             ax.plot(hist[:, 0], hist[:, 2],linestyle='-', label='Current Energy')
         if Best_energy == True:
             ax.plot(hist[:, 0], hist[:, 3],linestyle='-', label='Best Energy')

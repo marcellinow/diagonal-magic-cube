@@ -182,7 +182,8 @@ class Tensor:
         8. Summation of all the diagonals from up to down through the levels = MC
         9. Summation of all the diagonals from down to up through the levels = MC
         10. Summation of the space diagonal through levels = MC
-        
+        Reference:
+        https://www.magischvierkant.com/three-dimensional-eng/magic-features
         '''
         Z = 0
         n = self.max_len()
