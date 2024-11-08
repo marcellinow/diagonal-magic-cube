@@ -86,9 +86,13 @@ class Simulated:
 
             de = e_n - self.current_energy
 
+            if de < 0:
+                probability = 1
+            else:
+                probability = self.safe_exp(-de/self.t)
+
             random_num = random.random()
-            accept_prob = -de/self.t
-            probability = self.safe_exp(accept_prob)
+
             print(100*"=")
             print(f"Step:{self.step}, Energy: {e_n}, Best Energy: {self.best_energy},Temperature: {self.t}, Probability: {probability}\n")
             print(100*"=")
@@ -144,19 +148,29 @@ class Simulated:
 
     # Move Function
     def move(self):
-        shape = self.cube.max_len()
-        p1 = (np.random.randint(0, shape), 
-                np.random.randint(0, shape), 
-                np.random.randint(0, shape))
-        p2 = p1
-        while p2 == p1:
-            p2 = (np.random.randint(0, shape), 
-                    np.random.randint(0, shape), 
-                    np.random.randint(0, shape))
-        # print(40*"=")
-        # print(f"Substitutes ({self.cube.array[p1]}) with ({self.cube.array[p2]})\n")
-        # print(40*"=")
-        self.cube.array[p1], self.cube.array[p2] = self.cube.array[p2], self.cube.array[p1]
+        n = self.cube.max_len()
+        best_neighbor = copy.deepcopy(self.cube)
+        best_energy = self.best_energy
+        for _ in range(10):
+            p1 = (np.random.randint(0, n), 
+                    np.random.randint(0, n), 
+                    np.random.randint(0, n))
+            
+            while True:
+                p2 = (np.random.randint(0, n), 
+                        np.random.randint(0, n), 
+                        np.random.randint(0, n))
+                if p2 != p1:
+                    break
+            self.cube.array[p1], self.cube.array[p2] = self.cube.array[p2], self.cube.array[p1]
+            temp_energy = self.cube.objective_function()
+
+            if temp_energy < best_energy:
+                best_neighbor = copy.deepcopy(self.cube)
+                best_energy = temp_energy
+            
+            self.cube.array[p2], self.cube.array[p1] = self.cube.array[p1], self.cube.array[p2]
+        self.cube = best_neighbor
         return self.cube
     
     # Safe Exponential to avoid Math Range error
