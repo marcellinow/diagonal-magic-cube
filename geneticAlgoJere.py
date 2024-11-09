@@ -11,6 +11,7 @@ import random
 import numpy as np
 from math import exp
 from tensor import *
+import copy
 
 class GeneticAlgo:
     def __init__(self, cube, goal_cube, population_size, generation_rate):
@@ -20,7 +21,7 @@ class GeneticAlgo:
         self.generation_rate = generation_rate
         self.population = []
         mutation_rate = 0.1
-        goal_fitness = 0
+        goal_fitness = goal_cube.objective_function()
         self.history = []
 
         # Initial Population
@@ -29,13 +30,14 @@ class GeneticAlgo:
         
         while len(self.population) < self.population_size:
             # print(f"Current population size: {len(self.population)}")
-            new_cube = self.cube.randomize_value()
+            initial_cube = copy.deepcopy(self.cube)
+            new_cube = initial_cube.randomize_value()
             # print("Generated new cube")
-            # if all(not existing_cube.same_tensor(new_cube) for existing_cube in self.population):
-            self.population.append(new_cube)
-            # print("Added new cube to population")
-            # else:
-            #     print("Cube already exists in population")
+            if all(not existing_cube.same_tensor(new_cube) for existing_cube in self.population):
+                self.population.append(new_cube)
+                # print("Added new cube to population")
+            else:
+                print("Cube already exists in population")
         print("Initial Population Generated with size: ", len(self.population))
         self.sort_population_by_fitness(self.population)
        
@@ -62,11 +64,11 @@ class GeneticAlgo:
                     self.mutate(child2)
 
                 # New Generation
-                # if all(not existing_cube.same_tensor(child1) for existing_cube in new_population):
-                new_population.append(child1)
+                if all(not existing_cube.same_tensor(child1) for existing_cube in new_population):
+                    new_population.append(child1)
                 if len(new_population) < self.population_size:
-                    # if all(not existing_cube.same_tensor(child2) for existing_cube in new_population):
-                     new_population.append(child2)
+                    if all(not existing_cube.same_tensor(child2) for existing_cube in new_population):
+                        new_population.append(child2)
                 
             self.sort_population_by_fitness(new_population)
             best_solution = new_population[0]
