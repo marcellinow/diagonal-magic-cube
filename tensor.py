@@ -15,16 +15,20 @@ class Tensor:
         r = row
         c = column
         h = height
+        initial_array   = if there is already an array, insert to this variable
         '''
         # Instantiate
         self.r = r
         self.c = c
         self.h = h
         self.shape = (r,c,h)
+        n = max(r,c,h)
+        self.MC = ((n * ( (n ** 3)+1))/2)
 
         
-        # Auto make tensor  r x c x h   with rank h
+        # Auto make tensor  r x c x h   with heigth h
         self.array = []
+        
 
         # Inialize the tensor with value 0
         if initial_array is not None:
@@ -38,8 +42,6 @@ class Tensor:
                 self.array.append(h_array)
             self.array = np.array(self.array)
 
-        # state
-        self.current_state = self.array
 
     def print_tensor(self):
         level = self.h
@@ -161,16 +163,12 @@ class Tensor:
     '''
     Magic Cube Functions
     '''
-
-    def magic_constant(self):
-        n = self.max_len()
-        return ((n * ( (n ** 3)+1))/2)
     
     def straight_line(self):
         n = self.max_len()
         return  3 * n ** 2 + 6* n + 4
     
-    def objective_function(self):
+    def objective_function(self,square_error=True):
         '''
         - Summation of all rows in each level = MC V
         - Summation of all columns in each level = MC V
@@ -185,58 +183,89 @@ class Tensor:
         '''
         Z = 0
         n = self.max_len()
-        MC = self.magic_constant()
+        if square_error == True:
+            # Row, Column, and Level
+            for i in range(n):
+                for j in range(n):
+                    row_sum = np.sum(self.array[i,j,:])
 
-        # Row, Column, and Level
-        for i in range(n):
-            for j in range(n):
-                row_sum = np.sum(self.array[i,j,:])
-                # print(f"row: {self.array[i,j,:]}\n")
-                Z += (row_sum - MC) ** 2
-                col_sum = np.sum(self.array[i,:,j])
-                # print(f"col: {self.array[i,:,j]}\n")
-                Z += (col_sum - MC) ** 2 
-                # print(f"pillar: {self.array[:,i,j]}\n")
-                pillar_sum = np.sum(self.array[:,i,j])
-                Z += (pillar_sum - MC) ** 2
+                    Z += (row_sum - self.MC) ** 2
+                    col_sum = np.sum(self.array[i,:,j])
 
-                # print(f"Row sum at ({i},{j}): {row_sum}, Column sum at ({i},{j}): {col_sum}, Level sum at ({i},{j}): {level_sum}")
+                    Z += (col_sum - self.MC) ** 2 
 
-        # Main Diagonal
-        for level in range(self.h):
-            main_diagonal_left = 0
-            main_diagonal_right = 0
-            # print(f"LEVEL {level}\n")
-            for i in range(self.r):
-                # print(f"element at ({level},{i},{i}): {self.array[level,i,i]}\n")
-                # print(f"element at ({level},{i},{self.h-1-i}): {self.array[level,i,self.h-1-i]}\n")
-                main_diagonal_left += self.array[level, i, i]
-                main_diagonal_right += self.array[level, i, self.h-1-i]
-            Z += (main_diagonal_left - MC) ** 2
-            Z += (main_diagonal_right - MC) ** 2
+                    pillar_sum = np.sum(self.array[:,i,j])
+                    Z += (pillar_sum - self.MC) ** 2
+            # Main Diagonal
+            for level in range(self.h):
+                main_diagonal_left = 0
+                main_diagonal_right = 0
+                for i in range(self.r):
+                    main_diagonal_left += self.array[level, i, i]
+                    main_diagonal_right += self.array[level, i, self.h-1-i]
+                Z += (main_diagonal_left - self.MC) ** 2
+                Z += (main_diagonal_right - self.MC) ** 2
 
-        # Diagonal Spaces
-        space_diagonal_left = 0
-        space_diagonal_right = 0
-        for i in range(self.max_len()):
-            # print(f"({self.h - (self.h - i)},{i},{i})\n")
-            # print(f"element : ({self.array[self.h - (self.h -i),i,i]})\n\n")
-            # print(f"({i},{i},{self.h - 1 - i})\n")
-            # print(f"element : ({self.array[i,i, self.h - 1 - i]})\n\n")
-            space_diagonal_left += self.array[self.h - (self.h - i),i,i]
-            space_diagonal_right += self.array[i,i, self.h - 1 - i]
-        Z += (space_diagonal_left - MC) ** 2
-        Z += (space_diagonal_right - MC) ** 2
+            # Diagonal Spaces
+            space_diagonal_left = 0
+            space_diagonal_right = 0
+            for i in range(self.max_len()):
+                space_diagonal_left += self.array[self.h - (self.h - i),i,i]
+                space_diagonal_right += self.array[i,i, self.h - 1 - i]
+            Z += (space_diagonal_left - self.MC) ** 2
+            Z += (space_diagonal_right - self.MC) ** 2
 
-        # Space Summation 
-        for i in range(self.max_len()):
-            space_row = 0
-            space_col = 0
-            for j in range(self.max_len()):
-                # print(f"({self.h - (self.h - j)},{i},{self.c - (self.c - j)})\n")
-                # print(f"element : ({self.array[self.h - (self.h -j),i,self.c - (self.c - j)]})\n\n")
-                space_row += self.array[self.h - (self.h - j),i,self.c - (self.c - j)]
-                space_col += self.array[self.h - (self.h - j),self.r - (self.r - j),i]
-            Z += (space_row - MC) ** 2
-            Z += (space_col - MC) ** 2
+            # Space Summation 
+            for i in range(self.max_len()):
+                space_row = 0
+                space_col = 0
+                for j in range(self.max_len()):
+                    space_row += self.array[self.h - (self.h - j),i,self.c - (self.c - j)]
+                    space_col += self.array[self.h - (self.h - j),self.r - (self.r - j),i]
+                Z += (space_row - self.MC) ** 2
+                Z += (space_col - self.MC) ** 2
+        else:
+            # Row, Column, and Level
+            for i in range(n):
+                for j in range(n):
+                    row_sum = np.sum(self.array[i,j,:])
+
+                    Z += np.abs((row_sum - self.MC))
+                    col_sum = np.sum(self.array[i,:,j])
+
+                    Z += np.abs((col_sum - self.MC)  )
+
+                    pillar_sum = np.sum(self.array[:,i,j])
+                    Z += np.abs((pillar_sum - self.MC) )
+
+
+
+            # Main Diagonal
+            for level in range(self.h):
+                main_diagonal_left = 0
+                main_diagonal_right = 0
+                for i in range(self.r):
+                    main_diagonal_left += self.array[level, i, i]
+                    main_diagonal_right += self.array[level, i, self.h-1-i]
+                Z += np.abs((main_diagonal_left - self.MC)) 
+                Z += np.abs((main_diagonal_right - self.MC) )
+
+            # Diagonal Spaces
+            space_diagonal_left = 0
+            space_diagonal_right = 0
+            for i in range(self.max_len()):
+                space_diagonal_left += self.array[self.h - (self.h - i),i,i]
+                space_diagonal_right += self.array[i,i, self.h - 1 - i]
+            Z += np.abs((space_diagonal_left - self.MC) )
+            Z += np.abs((space_diagonal_right - self.MC) )
+
+            # Space Summation 
+            for i in range(self.max_len()):
+                space_row = 0
+                space_col = 0
+                for j in range(self.max_len()):
+                    space_row += self.array[self.h - (self.h - j),i,self.c - (self.c - j)]
+                    space_col += self.array[self.h - (self.h - j),self.r - (self.r - j),i]
+                Z += np.abs((space_row - self.MC) )
+                Z += np.abs((space_col - self.MC) )
         return Z
