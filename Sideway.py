@@ -3,7 +3,7 @@ from tensor import *
 import copy
 
 class Sideway:
-    def __init__(self,cube,limit = 100):
+    def __init__(self,cube,max_sideway_move = 100):
 
         self.cube = cube
 
@@ -16,21 +16,44 @@ class Sideway:
         self.proposed_neighbor = copy.deepcopy(self.cube)
         self.hist = []
 
-        self.isGoal = False
         self.step = 0
+        self.sideway_ctr = 0
 
-        while self.step < limit:
+        isTerminate = False
+        while isTerminate == False:
+            if self.best_value != 0:
+                neighbor = self.bestNeighbors()
+                if (neighbor.objective_function() == 0):
+                    self.best_state = neighbor
+                    self.best_value = neighbor.objective_function()
+                    break
+
+                if neighbor.objective_function() == self.current_value:
+                    self.sideway_ctr += 1
+                    self.sideway_step = 0
+                    while (self.sideway_step <= max_sideway_move):
+                        choosen_neighbor = self.move()
+                        if choosen_neighbor.objective_function() < self.current_value:
+                            self.best_state = choosen_neighbor
+                            self.current_value = choosen_neighbor.objective_function()
+                            break
+                        self.sideway_step += 1
+                elif neighbor.objective_function() < self.current_value:
+                    self.best_value = neighbor.objective_function()
+                    self.best_state = neighbor
+                else:
+                    isTerminate = True
             
-            neighbor = self.bestNeighbors()
-
-            if neighbor.objective_function() < self.best_value:
-                self.best_value = neighbor.objective_function()
-            self.step += 1
+            self.hist.append([
+                self.step,
+                self.sideway_ctr,
+                
+            ])
+            
             
 
-    def swap(self):
+    def move(self):
         shape = self.cube.shape
-
         p0 = (np.random.randint(0,shape[0]),
               np.random.randint(0,shape[1]),
               np.random.randint(0,shape[2]))
@@ -41,7 +64,7 @@ class Sideway:
               np.random.randint(0,shape[2]))
         self.cube.array[p0], self.cube.array[p1] = self.cube.array[p1], self.cube.array[p0]
 
-        return self.cubes
+        return self.cube
     
     def bestNeighbors(self):
         heuristic_cube = copy.deepcopy(self.current_state)
@@ -50,8 +73,8 @@ class Sideway:
         num_neighbors = int((n * (n-1))/2)
 
         for _ in range(num_neighbors):
-            new_cube = copy.deepcopy(heuristic_cube.swap())
-            
+            new_cube = copy.deepcopy(self.move())
+
             if new_cube.objective_function() < heuristic_cube.objective_function():
                 proposed_neighbors.append(new_cube)
 
@@ -63,7 +86,3 @@ class Sideway:
             if neighbor_value < optimized_value:
                 best_neighbor = neighbor
         return best_neighbor
-
-
-
-

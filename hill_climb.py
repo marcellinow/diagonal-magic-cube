@@ -36,9 +36,7 @@ class Hill_climb:
         
         while True:
             self.best_neighbor,self.best_neighbor_value = self.best_successor()
-            
-            
-
+        
             if self.best_neighbor_value < self.best_value:
                 print(f"Step {self.step}: Choosen Neighbor Value: {self.best_neighbor_value}; Best Value: {self.best_value}")
                 self.best_value = self.best_neighbor_value
