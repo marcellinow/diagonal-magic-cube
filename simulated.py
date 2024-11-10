@@ -19,7 +19,7 @@ import timeit
 import pandas as pd
 
 class Simulated:
-    def __init__(self,cube,tmin=0,tmax=100,cooling_schedule='linear',alpha = None,step_max = 1000,greedy_move=False,function_error = 'squared'):
+    def __init__(self,cube,tmin=0,tmax=100,cooling_schedule='linear',alpha = None,step_max = 1000,greedy_move=False,function_error = 'absolute'):
         '''
         parameters:
         - intial_state -> give the initial state of the problem space
@@ -97,20 +97,24 @@ class Simulated:
             e_n = choosen_neighbor.objective_function(square_error = self.function_error)
 
             de = e_n - self.current_energy
-                            
-            # print(100*"=")
-            # print(f"Step:{self.step},Neighbor's Energy: {e_n}, Best Energy: {self.best_energy}, -de: {-de}, Temperature: {self.t}, Probability: {probability}\n")
-            # print(100*"=")
+            if de < 0:
+                probability = 1
+            else:
+                probability = self.safe_exp(-de/self.t)
+
+            print(50*"=")
+            print(f"Step:{self.step},Neighbor's Energy: {e_n}, Best Energy: {self.best_energy}, -de: {-de}, Temperature: {self.t}, Probability: {probability}\n")
+            print(50*"=")
 
             if de < 0:
                 self.current_energy = e_n
                 self.current_state = copy.deepcopy(choosen_neighbor)
                 self.accept += 1
             else:
-                probability = self.safe_exp(-de/self.t)
                 rand_val = random.random()
                 if rand_val < probability:
-                    print(f"rand_val: {rand_val}\n")
+                    # print(f"rand_val: {rand_val}\n")
+                    # print(f"Probability: {probability}\n")
                     self.stuck_ctr += 1
                     self.step_stuck.append(self.step)
                     self.current_energy = e_n
@@ -216,7 +220,7 @@ class Simulated:
         to avoid Math Range error
         '''    
         try:
-            return np.exp(x)
+            return max(-700,min(700,np.exp(x)))
         except:
             return 0
 

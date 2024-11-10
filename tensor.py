@@ -42,6 +42,40 @@ class Tensor:
                 self.array.append(h_array)
             self.array = np.array(self.array)
 
+    def plot_cube(self,title="Tensor 5 x 5 x"):
+        levels_per_row = 3  
+        rows_needed = (self.h + levels_per_row - 1) // levels_per_row  
+        
+        fig, axes = plt.subplots(rows_needed, levels_per_row, figsize=(7, 7))
+        axes = np.array(axes).reshape(rows_needed, levels_per_row)  
+
+        for h in range(self.h):
+            row = h // levels_per_row  
+            col = h % levels_per_row   
+            ax = axes[row, col]  
+            
+            ax.set_title(f"Level {h + 1}", fontsize=12)
+            ax.set_xticks([])
+            ax.set_yticks([])
+            ax.set_aspect('equal')
+
+            level_data = self.array[h][::-1]
+            for r in range(self.r):
+                for c in range(self.c):
+                    # Plot cell value in the center
+                    ax.text(c + 0.5, r + 0.5, str(level_data[r][c]), ha="center", va="center", fontsize=10)
+                    
+                    ax.plot([c, c+1], [r, r], color="black")
+                    ax.plot([c, c+1], [r+1, r+1], color="black")
+                    ax.plot([c, c], [r, r+1], color="black")
+                    ax.plot([c+1, c+1], [r, r+1], color="black")
+            
+            ax.set_xlim(0, self.c)
+            ax.set_ylim(0, self.r)
+        for extra in range(self.h, rows_needed * levels_per_row):
+            fig.delaxes(axes.flat[extra])
+        plt.subplots_adjust(wspace=0.2, hspace=0)
+        plt.show()
 
     def print_tensor(self):
         level = self.h
@@ -52,41 +86,6 @@ class Tensor:
                 print(row)
             print()
 
-    def plot_cube(self,title="Tensor Cube"):
-        fig = plt.figure(figsize=(15,15))
-        ax = fig.add_subplot(111,projection="3d")
-        ax.set_box_aspect([self.r, self.c, self.h])
-
-        for h in range(self.h):
-            for r in range(self.r):
-                for c in range(self.c):
-                    ax.text(r,c,h,f"{self.array[h][r][c]}",ha="center",va="center",fontsize=14,color="blue")
-                    ax.scatter(r,c,h,c="orange",s=500,edgecolors="k",alpha=0.4)
-            
-        ax.set_xlabel("column-axis")
-        ax.set_ylabel("row-axis")
-        ax.set_zlabel("level")
-        plt.title(title)
-        return plt.show()
-    
-    def plot_per_level(self,title="Tensor Cube"):
-         for h in range(self.h):
-            fig = plt.figure(figsize=(8, 8))
-            ax = fig.add_subplot(111, projection="3d")
-            ax.set_box_aspect([self.r, self.c, 1])
-
-            # Plot cells within the current level
-            for r in range(self.r):
-                for c in range(self.c):
-                    ax.text(r, c, 0, f"{self.array[h][r][c]}", ha="center", va="center", fontsize=14, color="blue")
-                    ax.scatter(r, c, 0, c="orange", s=500, edgecolors="k", alpha=0.4)
-
-            # Labels and title
-            ax.set_xlabel("Column-axis")
-            ax.set_ylabel("Row-axis")
-            ax.set_zlabel("Level")
-            plt.title(f"{title} - Level {h + 1}")
-            plt.show()
 
     def same_tensor(self,tensor):
         '''
@@ -168,7 +167,7 @@ class Tensor:
         n = self.max_len()
         return  3 * n ** 2 + 6* n + 4
     
-    def objective_function(self,square_error=True):
+    def objective_function(self,square_error=False):
         '''
         - Summation of all rows in each level = MC V
         - Summation of all columns in each level = MC V
