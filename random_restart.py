@@ -13,10 +13,6 @@ class Random_restart:
         parameters:
         - intial_state -> give the initial state of the problem space
         '''
-
-        # Check Parameter
-
-        
         
         # Initialization
         self.hist = []
@@ -62,11 +58,7 @@ class Random_restart:
         return Tensor(5,5,5,self.best_state.array)
     def results(self):
         print('+------------------------ RESULTS -------------------------+\n')
-        # print(f'      opt.mode: {self.obj_func}')
-        # if self.damping != 1: print(f'       damping: {self.damping}\n')
-        # else: print('\n')
         print(f'    Best iteration: {self.best_iteration}\n')
-
         print(f'  final Value: {self.best_value:0.6f}\n')
         print('+-------------------------- END ---------------------------+')
 
