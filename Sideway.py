@@ -7,8 +7,6 @@ class Sideway:
 
         self.cube = cube
 
-        self.move = 0
-
         self.current_state = copy.deepcopy(self.cube)
         self.best_state = copy.deepcopy(self.current_state)
 
@@ -19,6 +17,16 @@ class Sideway:
         self.hist = []
 
         self.isGoal = False
+        self.step = 0
+
+        while self.step < 100:
+            
+            neighbor = self.bestNeighbors()
+
+            if neighbor.objective_function() < self.best_value:
+                self.best_value = neighbor.objective_function()
+            self.step += 1
+            
 
     def move(self):
         shape = self.cube.shape
@@ -35,22 +43,27 @@ class Sideway:
 
         return self.cubes
     
-    def calculateNeighbors(self):
-        return x
-
-    def bestlNeighbors(self):
+    def bestNeighbors(self):
         heuristic_cube = copy.deepcopy(self.cube)
         proposed_neighbors =[]
-        for _ in range(heuristic_cube.h):
-            for _ in range(heuristic_cube.r):
-                for _ in range(heuristic_cube.c):
-                    new_cube = copy.deepcopy(heuristic_cube.move())
+        n = heuristic_cube.max_len()
+        num_neighbors = int((n * (n-1))/2)
 
-                    if new_cube.objective_function() < heuristic_cube.objective_function():
-                        proposed_neighbors.append(new_cube)
-        
-        for i in range(len(proposed_neighbors)):
-            optimized_value = proposed_neighbors[i]
+        for _ in range(num_neighbors):
+            new_cube = copy.deepcopy(heuristic_cube.move())
+            if new_cube.same_tensor(heuristic_cube) == False:
+                if new_cube.objective_function() < heuristic_cube.objective_function():
+                    proposed_neighbors.append(new_cube)
+
+        best_neighbor = proposed_neighbors[0]
+        optimized_value = best_neighbor.objective_function()
+
+        for neighbor in proposed_neighbors[1:]:
+            neighbor_value = neighbor.objective_function()
+            if neighbor_value < optimized_value:
+                best_neighbor = neighbor
+        return best_neighbor
+
 
 
 
