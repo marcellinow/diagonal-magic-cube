@@ -86,7 +86,7 @@ class Simulated:
 
         self.step = 1
         self.accept = 0
-        # print(f"Initial State: {self.current_state}\n")
+        
         self.start_time = timeit.default_timer()
         self.stuck_ctr = 0
         self.step_stuck = []
@@ -113,8 +113,7 @@ class Simulated:
             else:
                 rand_val = random.random()
                 if rand_val < probability:
-                    # print(f"rand_val: {rand_val}\n")
-                    # print(f"Probability: {probability}\n")
+                
                     self.stuck_ctr += 1
                     self.step_stuck.append(self.step)
                     self.current_energy = e_n
@@ -251,9 +250,6 @@ class Simulated:
         ax.legend()
 
         plt.show()
-
-
-
 
     def prob_plot(self,title=None):
         hist = np.array(self.hist)

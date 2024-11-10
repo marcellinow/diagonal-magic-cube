@@ -19,7 +19,7 @@ class Sideway:
         self.isGoal = False
         self.step = 0
 
-        while self.step < 100:
+        while self.step < limit:
             
             neighbor = self.bestNeighbors()
 
@@ -28,7 +28,7 @@ class Sideway:
             self.step += 1
             
 
-    def move(self):
+    def swap(self):
         shape = self.cube.shape
 
         p0 = (np.random.randint(0,shape[0]),
@@ -50,10 +50,10 @@ class Sideway:
         num_neighbors = int((n * (n-1))/2)
 
         for _ in range(num_neighbors):
-            new_cube = copy.deepcopy(heuristic_cube.move())
-            if new_cube.same_tensor(heuristic_cube) == False:
-                if new_cube.objective_function() < heuristic_cube.objective_function():
-                    proposed_neighbors.append(new_cube)
+            new_cube = copy.deepcopy(heuristic_cube.swap())
+            
+            if new_cube.objective_function() < heuristic_cube.objective_function():
+                proposed_neighbors.append(new_cube)
 
         best_neighbor = proposed_neighbors[0]
         optimized_value = best_neighbor.objective_function()

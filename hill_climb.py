@@ -33,11 +33,10 @@ class Hill_climb:
         # optimization
 
         self.step = 1
-        # print(f"Initial State: {self.current_state}\n")
         
         while True:
             self.best_neighbor,self.best_neighbor_value = self.best_successor()
-            #print(f"choosen_neighbor = {self.best_neighbor.array}\n")
+            
             
 
             if self.best_neighbor_value < self.best_value:
@@ -58,8 +57,8 @@ class Hill_climb:
 
             
     def best_successor(self):
-        # print("Finding Best Successor...\n")
-        # print("Current Cube:\n", current_cube)
+        
+        
 
         
         neighbors = []
@@ -82,8 +81,7 @@ class Hill_climb:
             if neighbor_value < best_neighbor_value:
                 best_neighbor = neighbor
                 best_neighbor_value = neighbor_value
-
-        
+    
         return best_neighbor, best_neighbor_value
 
 
@@ -92,11 +90,7 @@ class Hill_climb:
         return Tensor(5,5,5,self.best_state)
     def results(self):
         print('+------------------------ RESULTS -------------------------+\n')
-        # print(f'      opt.mode: {self.obj_func}')
-        # if self.damping != 1: print(f'       damping: {self.damping}\n')
-        # else: print('\n')
         print(f'    final step: {self.step}\n')
-
         print(f'  final Value: {self.best_value:0.6f}\n')
         print('+-------------------------- END ---------------------------+')
 
