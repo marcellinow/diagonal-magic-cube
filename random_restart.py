@@ -59,7 +59,7 @@ class Random_restart:
 
 
     def final_state(self):
-        return Tensor(5,5,5,self.best_state).print_tensor()
+        return Tensor(5,5,5,self.best_state)
     def results(self):
         print('+------------------------ RESULTS -------------------------+\n')
         # print(f'      opt.mode: {self.obj_func}')
