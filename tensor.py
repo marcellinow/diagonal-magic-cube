@@ -95,10 +95,10 @@ class Tensor:
         if self.array.shape != tensor.array.shape:
             return False
         
-        for heigth in range(self.h):
+        for height in range(self.h):
             for row in range(self.r):
                 for col in range(self.c):
-                    if self.array[heigth,row,col] != tensor.array[heigth,row,col]:
+                    if self.array[height,row,col] != tensor.array[heigth,row,col]:
                         return False
         return True
                             
