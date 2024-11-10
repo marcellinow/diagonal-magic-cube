@@ -38,7 +38,7 @@ class Random_restart:
             self.local_optimum_value = self.local_optimum.best_value
 
             if self.local_optimum_value < self.best_value:
-                self.best_state = self.local_optimum
+                self.best_state = self.local_optimum.current_state
                 self.best_value = self.local_optimum_value
                 
                 self.best_iteration = i
@@ -59,7 +59,7 @@ class Random_restart:
 
 
     def final_state(self):
-        return Tensor(5,5,5,self.best_state)
+        return Tensor(5,5,5,self.best_state.array)
     def results(self):
         print('+------------------------ RESULTS -------------------------+\n')
         # print(f'      opt.mode: {self.obj_func}')

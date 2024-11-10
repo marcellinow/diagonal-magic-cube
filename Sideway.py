@@ -44,7 +44,7 @@ class Sideway:
         return self.cubes
     
     def bestNeighbors(self):
-        heuristic_cube = copy.deepcopy(self.cube)
+        heuristic_cube = copy.deepcopy(self.current_state)
         proposed_neighbors =[]
         n = heuristic_cube.max_len()
         num_neighbors = int((n * (n-1))/2)

@@ -42,7 +42,7 @@ class Tensor:
                 self.array.append(h_array)
             self.array = np.array(self.array)
 
-    def plot_cube(self,title="Tensor 5 x 5 x"):
+    def plot_cube(self,title="Tensor"):
         levels_per_row = 3  
         rows_needed = (self.h + levels_per_row - 1) // levels_per_row  
         

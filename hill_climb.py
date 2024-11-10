@@ -16,13 +16,13 @@ class Hill_climb:
         
         # Initialization
         self.hist = []
-        self.cube = cube
+        self.cube = copy.deepcopy(cube)
         self.obj_func = self.cube.objective_function()
         self.done = False
         self.neighbor_checked = 0
         self.current_state = copy.deepcopy(self.cube)
-        self.best_neighbor = self.current_state
-        self.best_state = self.current_state
+        self.best_neighbor = copy.deepcopy(self.current_state)
+        self.best_state = copy.deepcopy(self.current_state)
         self.current_value = self.obj_func
         self.best_value = self.current_value
         self.best_neighbor_value = float('inf')
@@ -89,7 +89,7 @@ class Hill_climb:
 
 
     def final_state(self):
-        return Tensor(5,5,5,self.best_state).print_tensor()
+        return Tensor(5,5,5,self.best_state)
     def results(self):
         print('+------------------------ RESULTS -------------------------+\n')
         # print(f'      opt.mode: {self.obj_func}')
