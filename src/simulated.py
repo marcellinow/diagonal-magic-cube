@@ -19,7 +19,7 @@ import timeit
 import pandas as pd
 
 class Simulated:
-    def __init__(self,cube,tmin=0,tmax=100,cooling_schedule='linear',alpha = None,step_max = 1000,greedy_move=False,function_error = 'absolute'):
+    def __init__(self,cube,tmin=0,tmax=100,cooling_schedule='linear',alpha = None,step_max = 1000,best_neighbor=False,function_error = 'absolute'):
         '''
         parameters:
         - intial_state -> give the initial state of the problem space
@@ -29,7 +29,7 @@ class Simulated:
         - cooling_schedule -> how we want the cooling (either linear or quadratic)
         - alpha -> hyperparamater for cooling schedule
         - step_max -> limitation step that agent can take
-        - greedy_move -> move function with greed search approach (best apporach)
+        - best_neighbor -> move function with greed search approach (best apporach)
         - function_error -> whether the differences on objective function use squared error or absolute error
         '''
 
@@ -93,7 +93,7 @@ class Simulated:
         while self.t >= self.tmin and self.step < self.step_max and self.t > 0:
 
             
-            choosen_neighbor = self.move(greedy_move=greedy_move,state=self.current_state)
+            choosen_neighbor = self.move(best_neighbor=best_neighbor,state=self.current_state)
             e_n = choosen_neighbor.objective_function(square_error = self.function_error)
 
             de = e_n - self.current_energy
@@ -112,8 +112,8 @@ class Simulated:
                 self.accept += 1
             else:
                 rand_val = random.random()
-                self.stuck_ctr += 1
                 if rand_val < probability:
+                    self.stuck_ctr += 1
                     self.step_stuck.append(self.step)
                     self.current_energy = e_n
                     self.current_state = copy.deepcopy(choosen_neighbor)
@@ -172,12 +172,13 @@ class Simulated:
         return self.tmin + (self.tmax - self.tmin) * (((self.step_max - step)/self.step_max)**2)
 
     # Move Function
-    def move(self, state, greedy_move=False):
+    def move(self, state, best_neighbor=False):
         n = self.cube.max_len()
-        if greedy_move:
-            best_neighbor = copy.deepcopy(state)
+        if best_neighbor:
+            best_neighbor = None
             best_energy = self.best_energy
-            for _ in range(10):
+            num_neighbors = int((n * (n-1))/2)
+            for _ in range(num_neighbors):
                 p1 = (np.random.randint(0, n), np.random.randint(0, n), np.random.randint(0, n))
                 p2 = p1
                 while p2 == p1:
@@ -185,10 +186,10 @@ class Simulated:
                 neighbor = copy.deepcopy(state)
                 neighbor.array[p1], neighbor.array[p2] = neighbor.array[p2], neighbor.array[p1]
                 temp_energy = self.cube.objective_function(square_error=self.function_error)
-                if temp_energy < best_energy:
+                if best_neighbor is None or temp_energy < best_energy:
                     best_neighbor = neighbor
                     best_energy = temp_energy
-            return best_neighbor
+            return best_neighbor if best_neighbor else state
         else:
             p1 = (np.random.randint(0, n), np.random.randint(0, n), np.random.randint(0, n))
             p2 = p1
@@ -210,12 +211,12 @@ class Simulated:
 
     # Hist Plot
 
-    def hist_plot(self, title=None, Curr_energy=True, Best_energy=True,freq_stuck = False):
+    def hist_plot(self, title=None, Curr_energy=True, Best_energy=True,freq_stuck = False,widthsize=25,heightsize=5):
 
         hist = np.array(self.hist)
         
 
-        _, ax = plt.subplots(1, 1, figsize=(25, 5))
+        _, ax = plt.subplots(1, 1, figsize=(widthsize, heightsize))
 
 
         if Curr_energy:
@@ -236,9 +237,9 @@ class Simulated:
 
         plt.show()
 
-    def prob_plot(self,title=None):
+    def prob_plot(self,title=None,widthsize=25,heightsize=10):
         hist = np.array(self.hist)
-        _, ax = plt.subplots(1, 1, figsize=(15, 10))
+        _, ax = plt.subplots(1, 1, figsize=(widthsize, heightsize))
 
         ax.plot(hist[:,0],hist[:,4],linestyle='-',marker='',label='Probability',color='green')
         # ax.plot(hist[:,0],hist[:,4],marker='.',linestyle='',label='Probability',color='green')

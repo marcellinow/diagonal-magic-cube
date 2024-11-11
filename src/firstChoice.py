@@ -3,7 +3,6 @@ from tensor import *
 import copy
 import timeit
 
-
 class FirstChoice:
     def __init__(self,cube,function_error = 'absolute'):
 

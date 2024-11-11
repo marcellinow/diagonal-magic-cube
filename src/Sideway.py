@@ -33,7 +33,6 @@ class Sideway:
             
             neighbors= self.bestNeighbors()
             if (self.best_value == 0) or neighbors is None:
-                self.end_time = timeit.default_timer()
                 # print('ke first ifelse\n')
                 break
 
@@ -68,6 +67,7 @@ class Sideway:
                 self.current_value,
                 self.sideway_ctr,
             ])
+        self.end_time = timeit.default_timer()
             
     def move(self,state):
         shape = self.cube.shape
@@ -89,7 +89,7 @@ class Sideway:
         print(f'    initial Value: {self.initial_value:0.6f}')
         print(f'    final Value: {self.best_value:0.6f}\n')
         print(f'    Sideway counter: {self.sideway_ctr}\n')
-        # print(f'    runtime: {self.end_time - self.start_time} seconds')
+        print(f'    runtime: {self.end_time - self.start_time} seconds')
         print('+-------------------------- END ---------------------------+')
 
     def bestNeighbors(self):
