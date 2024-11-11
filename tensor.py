@@ -98,7 +98,7 @@ class Tensor:
         for height in range(self.h):
             for row in range(self.r):
                 for col in range(self.c):
-                    if self.array[height,row,col] != tensor.array[height,row,col]:
+                    if self.array[height,row,col] != tensor.array[heigth,row,col]:
                         return False
         return True
                             

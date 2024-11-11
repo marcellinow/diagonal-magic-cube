@@ -56,7 +56,7 @@ class Simulated:
 
         self.initial_state = copy.deepcopy(self.cube)
 
-        self.current_state = copy.deepcopy(self.cube).array
+        self.current_state = copy.deepcopy(self.cube)
         self.best_state = copy.deepcopy(self.current_state)
         self.best_energy = self.current_energy
 
@@ -93,7 +93,7 @@ class Simulated:
         while self.t >= self.tmin and self.step < self.step_max and self.t > 0:
 
             
-            choosen_neighbor = self.move(greedy_move=greedy_move)
+            choosen_neighbor = self.move(greedy_move=greedy_move,state=self.current_state)
             e_n = choosen_neighbor.objective_function(square_error = self.function_error)
 
             de = e_n - self.current_energy
@@ -112,9 +112,8 @@ class Simulated:
                 self.accept += 1
             else:
                 rand_val = random.random()
+                self.stuck_ctr += 1
                 if rand_val < probability:
-                
-                    self.stuck_ctr += 1
                     self.step_stuck.append(self.step)
                     self.current_energy = e_n
                     self.current_state = copy.deepcopy(choosen_neighbor)
@@ -173,45 +172,31 @@ class Simulated:
         return self.tmin + (self.tmax - self.tmin) * (((self.step_max - step)/self.step_max)**2)
 
     # Move Function
-    def move(self,greedy_move = False):
+    def move(self, state, greedy_move=False):
         n = self.cube.max_len()
-        if greedy_move == True:
-            '''
-            This is move when you want a greedy move inside the algorithm
-            '''
-            best_neighbor = copy.deepcopy(self.cube)
+        if greedy_move:
+            best_neighbor = copy.deepcopy(state)
             best_energy = self.best_energy
             for _ in range(10):
-                p1 = (np.random.randint(0, n), 
-                        np.random.randint(0, n), 
-                        np.random.randint(0, n))
+                p1 = (np.random.randint(0, n), np.random.randint(0, n), np.random.randint(0, n))
                 p2 = p1
                 while p2 == p1:
-                    p2 = (np.random.randint(0, n), 
-                            np.random.randint(0, n), 
-                            np.random.randint(0, n))
-                self.cube.array[p1], self.cube.array[p2] = self.cube.array[p2], self.cube.array[p1]
-                temp_energy = self.cube.objective_function(square_error = self.function_error)
-
+                    p2 = (np.random.randint(0, n), np.random.randint(0, n), np.random.randint(0, n))
+                neighbor = copy.deepcopy(state)
+                neighbor.array[p1], neighbor.array[p2] = neighbor.array[p2], neighbor.array[p1]
+                temp_energy = self.cube.objective_function(square_error=self.function_error)
                 if temp_energy < best_energy:
-                    best_neighbor = copy.deepcopy(self.cube)
+                    best_neighbor = neighbor
                     best_energy = temp_energy
-                
-                self.cube.array[p2], self.cube.array[p1] = self.cube.array[p1], self.cube.array[p2]
-            self.cube = copy.deepcopy(best_neighbor)
+            return best_neighbor
         else:
-            neighbor = copy.deepcopy(self.cube)
-            p1 = (np.random.randint(0, n), 
-                        np.random.randint(0, n), 
-                        np.random.randint(0, n))
+            p1 = (np.random.randint(0, n), np.random.randint(0, n), np.random.randint(0, n))
             p2 = p1
             while p2 == p1:
-                p2 = (np.random.randint(0, n), 
-                        np.random.randint(0, n), 
-                        np.random.randint(0, n))
+                p2 = (np.random.randint(0, n), np.random.randint(0, n), np.random.randint(0, n))
+            neighbor = copy.deepcopy(state)
             neighbor.array[p1], neighbor.array[p2] = neighbor.array[p2], neighbor.array[p1]
-            self.cube = copy.deepcopy(neighbor)
-        return self.cube
+            return neighbor
     
     # Safe Exponential 
     def safe_exp(self,x):

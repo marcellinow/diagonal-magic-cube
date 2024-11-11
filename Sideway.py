@@ -71,7 +71,6 @@ class Sideway:
             
     def move(self,state):
         shape = self.cube.shape
-        moved_cube = copy.deepcopy(state)
         p0 = (np.random.randint(0,shape[0]),
               np.random.randint(0,shape[1]),
               np.random.randint(0,shape[2]))
@@ -80,6 +79,7 @@ class Sideway:
             p1 = (np.random.randint(0,shape[0]),
               np.random.randint(0,shape[1]),
               np.random.randint(0,shape[2]))
+        moved_cube = copy.deepcopy(state)
         moved_cube.array[p0], moved_cube.array[p1] = moved_cube.array[p1], moved_cube.array[p0]
         return moved_cube
     
@@ -93,24 +93,22 @@ class Sideway:
         print('+-------------------------- END ---------------------------+')
 
     def bestNeighbors(self):
-        first_neighbor = copy.deepcopy(self.current_state)
-        first_neighbor = self.move(first_neighbor)
-        best_value = first_neighbor.objective_function()
-        n = self.cube.max_len() ** 2
+        best_value = self.current_value
         best_neighbor = None
+
+        n = self.cube.max_len() ** 2
         
         num_neighbors = int((n * (n-1))/2)
 
         for _ in range(num_neighbors):
-            candidate = copy.deepcopy(first_neighbor)
-            candidate = self.move(candidate)
+            candidate = self.move(self.current_state)
             candidate_value = candidate.objective_function(square_error = self.square_error)
 
             if candidate_value < best_value:
                 best_neighbor = candidate
                 best_value = candidate_value
 
-        return best_neighbor if best_neighbor else None
+        return best_neighbor
     
     def hist_plot(self, title='Steepest Descent Hill-Climbing with Sideway Move Plot'):
 

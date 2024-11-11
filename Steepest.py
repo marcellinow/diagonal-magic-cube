@@ -86,8 +86,6 @@ class Steepest:
         best_neighbor = None
 
         n = self.cube.max_len() ** 2
-
-        best_neighbor = None
         
         num_neighbors = int((n * (n-1))/2)
 
@@ -95,8 +93,9 @@ class Steepest:
             candidate = self.move(self.current_state)
             candidate_value = candidate.objective_function(square_error = self.square_error)
 
-            if candidate_value <= best_value:
+            if candidate_value < best_value:
                 best_neighbor = candidate
+                best_value = candidate_value
 
         return best_neighbor
 
