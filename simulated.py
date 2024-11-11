@@ -103,9 +103,9 @@ class Simulated:
             else:
                 probability = self.safe_exp(-de/self.t)
 
-            print(50*"=")
+            print(50*"- -")
             print(f"Step:{self.step},Neighbor's Energy: {e_n}, Best Energy: {self.best_energy}, de: {de}, Temperature: {self.t}, Probability: {probability}\n")
-            print(50*"=")
+            print(50*"- -")
 
             if de < 0:
                 self.current_energy = e_n

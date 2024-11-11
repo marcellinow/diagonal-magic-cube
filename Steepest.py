@@ -28,10 +28,10 @@ class Steepest:
 
         self.step = 0
 
-        isTerminate = True
+    
         self.start_time = timeit.default_timer()
         print(f"initial value: {self.initial_value}\n")
-        while isTerminate:
+        while True:
             neighbors = self.bestNeighbors()
             if (self.best_value == 0) or neighbors is None:
                 self.end_time = timeit.default_timer()
@@ -85,6 +85,8 @@ class Steepest:
         first_neighbor = self.move(first_neighbor)
         best_value = first_neighbor.objective_function()
         n = self.cube.max_len() ** 2
+
+        best_neighbor = None
         
         num_neighbors = int((n * (n-1))/2)
 
