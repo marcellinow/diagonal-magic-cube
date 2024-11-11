@@ -44,7 +44,6 @@ class Simulated:
         self.tmax = tmax
         self.cooling_schedule = cooling_schedule
         self.step_max = step_max
-
         if function_error == 'squared':
             self.function_error = True
         else:
@@ -57,7 +56,7 @@ class Simulated:
 
         self.initial_state = copy.deepcopy(self.cube)
 
-        self.current_state = copy.deepcopy(self.cube)
+        self.current_state = copy.deepcopy(self.cube).array
         self.best_state = copy.deepcopy(self.current_state)
         self.best_energy = self.current_energy
 
@@ -103,9 +102,9 @@ class Simulated:
             else:
                 probability = self.safe_exp(-de/self.t)
 
-            print(50*"- -")
-            print(f"Step:{self.step},Neighbor's Energy: {e_n}, Best Energy: {self.best_energy}, de: {de}, Temperature: {self.t}, Probability: {probability}\n")
-            print(50*"- -")
+            print(50*"=")
+            print(f"Step:{self.step},Neighbor's Energy: {e_n}, Best Energy: {self.best_energy}, -de: {-de}, Temperature: {self.t}, Probability: {probability}\n")
+            print(50*"=")
 
             if de < 0:
                 self.current_energy = e_n
@@ -180,8 +179,7 @@ class Simulated:
             '''
             This is move when you want a greedy move inside the algorithm
             '''
-            best_neighbor = copy.deepcopy(self.current_state)
-            candidate = copy.deepcopy(self.current_state)
+            best_neighbor = copy.deepcopy(self.cube)
             best_energy = self.best_energy
             for _ in range(10):
                 p1 = (np.random.randint(0, n), 
@@ -192,17 +190,17 @@ class Simulated:
                     p2 = (np.random.randint(0, n), 
                             np.random.randint(0, n), 
                             np.random.randint(0, n))
-                candidate.array[p1], candidate.array[p2] = candidate.array[p2], candidate.array[p1]
-                temp_energy = candidate.objective_function(square_error = self.function_error)
+                self.cube.array[p1], self.cube.array[p2] = self.cube.array[p2], self.cube.array[p1]
+                temp_energy = self.cube.objective_function(square_error = self.function_error)
 
                 if temp_energy < best_energy:
-                    best_neighbor = copy.deepcopy(candidate)
+                    best_neighbor = copy.deepcopy(self.cube)
                     best_energy = temp_energy
                 
-                candidate.array[p2], candidate.array[p1] = candidate.array[p1], candidate.array[p2]
-            return best_neighbor
+                self.cube.array[p2], self.cube.array[p1] = self.cube.array[p1], self.cube.array[p2]
+            self.cube = copy.deepcopy(best_neighbor)
         else:
-            neighbor = copy.deepcopy(self.current_state)
+            neighbor = copy.deepcopy(self.cube)
             p1 = (np.random.randint(0, n), 
                         np.random.randint(0, n), 
                         np.random.randint(0, n))
@@ -212,7 +210,8 @@ class Simulated:
                         np.random.randint(0, n), 
                         np.random.randint(0, n))
             neighbor.array[p1], neighbor.array[p2] = neighbor.array[p2], neighbor.array[p1]
-            return neighbor
+            self.cube = copy.deepcopy(neighbor)
+        return self.cube
     
     # Safe Exponential 
     def safe_exp(self,x):

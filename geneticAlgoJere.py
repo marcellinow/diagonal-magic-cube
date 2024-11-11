@@ -40,6 +40,8 @@ class GeneticAlgo:
                 print("Cube already exists in population")
         print("Initial Population Generated with size: ", len(self.population))
         self.sort_population_by_fitness(self.population)
+        self.history.append(self.population[0])
+
        
         # Evolution
         for i in range(self.generation_rate):
@@ -51,7 +53,6 @@ class GeneticAlgo:
             parent2 = self.population[1]
             # print("Parent 1 Fitness: ", parent1.objective_function())
             # print("Parent 2 Fitness: ", parent2.objective_function())
-            self.history.append(parent1)
 
             while len(new_population) <= self.population_size:
                 # Crossover
@@ -82,6 +83,7 @@ class GeneticAlgo:
             print("Generation: ", i+1, "Fitness: ", best_solution.objective_function())
 
         # Final Solution
+        print(len(self.history))
         print("Best solution found:")
         best_solution.plot_cube()
         print("Fitness:", best_solution.objective_function())
