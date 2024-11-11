@@ -61,7 +61,7 @@ class Steepest:
         print(f'    iterations: {self.step}\n')
         print(f'    initial Value: {self.initial_value:0.6f}\n')
         print(f'    final Value: {self.best_value:0.6f}\n')
-        # print(f'    runtime: {self.end_time - self.start_time} seconds')
+        print(f'    runtime: {self.end_time - self.start_time} seconds')
         print('+-------------------------- END ---------------------------+')
 
     def final_states(self):
@@ -99,7 +99,7 @@ class Steepest:
 
         return best_neighbor
 
-    def hist_plot(self, title='Steepest Ascent Hill-Climbing Plot'):
+    def hist_plot(self, title='Steepest Descent Hill-Climbing Plot'):
 
         hist = np.array(self.hist)
 
