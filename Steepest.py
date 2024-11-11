@@ -10,56 +10,57 @@ class Steepest:
         assert function_error in ['squared','absolute'], 'function error must be either squared or absolute'
         self.step = 0
         
-        self.cube = copy.deepcopy(cube)
-
         if function_error == 'absolute':
             self.square_error = False
         else:
             self.square_error = True
+        self.cube = copy.deepcopy(cube)
+        self.initial_value = self.cube.objective_function(square_error = self.square_error)
+
 
         self.current_state = copy.deepcopy(self.cube)
         self.current_value = self.current_state.objective_function(square_error = self.square_error)
 
         self.best_state = copy.deepcopy(self.current_state)
-        self.best_value = self.current_state.objective_function(square_error = self.square_error)
+        self.best_value = self.best_state.objective_function(square_error = self.square_error)
 
         self.hist = []
 
         self.step = 0
 
         isTerminate = True
+        self.start_time = timeit.default_timer()
+        print(f"initial value: {self.initial_value}\n")
         while isTerminate:
-            self.start_time = timeit.default_timer()
-            print(f"start_time: {self.start_time}\n")
             neighbors = self.bestNeighbors()
             if (self.best_value == 0) or neighbors is None:
-                print(f"end_time: {self.end_time}\n")
                 self.end_time = timeit.default_timer()
+                # print('ke first ifelse\n')
                 break
 
             self.step += 1
             neighbor_value = neighbors.objective_function(square_error = self.square_error)
             self.hist.append([self.step, self.current_value])
 
-            print(50*"- -\n")
+            print(50*"- -")
             print(f"step {self.step} ; best successor value: {neighbor_value} ; current value: {self.current_value}")
-            print(50*"- -\n")
+            print(50*"- -")
             
-            if neighbor_value <= self.current_value:
+            if neighbor_value < self.current_value:
                 self.best_state = copy.deepcopy(neighbors)
                 self.best_value = neighbor_value
                 self.current_state = copy.deepcopy(neighbors)
                 self.current_value = neighbor_value
             else:
-                self.end_time = timeit.default_timer()
-                print(f"end_time: {self.end_time}\n")
                 break
+        self.end_time = timeit.default_timer()
 
     def results(self):
         print('+------------------------ RESULTS -------------------------+\n')
-        print(f'    final step: {self.step}\n')
+        print(f'    iterations: {self.step}\n')
+        print(f'    initial Value: {self.initial_value:0.6f}\n')
         print(f'    final Value: {self.best_value:0.6f}\n')
-        print(f'    runtime: {self.end_time - self.start_time} seconds')
+        # print(f'    runtime: {self.end_time - self.start_time} seconds')
         print('+-------------------------- END ---------------------------+')
 
     def final_states(self):
@@ -67,7 +68,7 @@ class Steepest:
     
     def move(self,state):
         shape = self.cube.shape
-        change_cube = copy.deepcopy(state)
+        moved_cube = copy.deepcopy(state)
         p0 = (np.random.randint(0,shape[0]),
               np.random.randint(0,shape[1]),
               np.random.randint(0,shape[2]))
@@ -76,18 +77,19 @@ class Steepest:
             p1 = (np.random.randint(0,shape[0]),
               np.random.randint(0,shape[1]),
               np.random.randint(0,shape[2]))
-        change_cube.array[p0], change_cube.array[p1] = change_cube.array[p1], change_cube.array[p0]
-        return change_cube
+        moved_cube.array[p0], moved_cube.array[p1] = moved_cube.array[p1], moved_cube.array[p0]
+        return moved_cube
     
     def bestNeighbors(self):
-        best_neighbor = None
-        best_value = self.current_value
+        first_neighbor = copy.deepcopy(self.current_state)
+        first_neighbor = self.move(first_neighbor)
+        best_value = first_neighbor.objective_function()
         n = self.cube.max_len() ** 2
         
         num_neighbors = int((n * (n-1))/2)
 
         for _ in range(num_neighbors):
-            candidate = copy.deepcopy(self.current_state)
+            candidate = copy.deepcopy(first_neighbor)
             candidate = self.move(candidate)
             candidate_value = candidate.objective_function(square_error = self.square_error)
 

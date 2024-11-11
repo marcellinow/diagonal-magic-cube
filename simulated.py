@@ -104,7 +104,7 @@ class Simulated:
                 probability = self.safe_exp(-de/self.t)
 
             print(50*"=")
-            print(f"Step:{self.step},Neighbor's Energy: {e_n}, Best Energy: {self.best_energy}, -de: {-de}, Temperature: {self.t}, Probability: {probability}\n")
+            print(f"Step:{self.step},Neighbor's Energy: {e_n}, Best Energy: {self.best_energy}, de: {de}, Temperature: {self.t}, Probability: {probability}\n")
             print(50*"=")
 
             if de < 0:
@@ -196,7 +196,7 @@ class Simulated:
                 temp_energy = candidate.objective_function(square_error = self.function_error)
 
                 if temp_energy < best_energy:
-                    best_neighbor = copy.deepcopy(self.current_state)
+                    best_neighbor = copy.deepcopy(candidate)
                     best_energy = temp_energy
                 
                 candidate.array[p2], candidate.array[p1] = candidate.array[p1], candidate.array[p2]

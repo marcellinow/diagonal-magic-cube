@@ -1,17 +1,25 @@
 import numpy as np
 from tensor import *
 import copy
+import timeit
 
 class Sideway:
-    def __init__(self,cube,max_sideway_move = 100):
+    def __init__(self,cube,max_sideway_move = 100,function_error = 'absolute'):
 
-        self.cube = cube
+
+        if function_error == 'absolute':
+            self.square_error = False
+        else:
+            self.square_error = True
+
+        self.cube = copy.deepcopy(cube)
+        self.initial_value = self.cube.objective_function(square_error = self.square_error)
 
         self.current_state = copy.deepcopy(self.cube)
+        self.current_value = self.cube.objective_function(square_error = self.square_error)
+    
         self.best_state = copy.deepcopy(self.current_state)
-
-        self.current_value = self.cube.objective_function()
-        self.best_value = self.current_value
+        self.best_value = self.best_state.objective_function(square_erorr = self.square_error)
 
         self.hist = []
 
@@ -19,38 +27,52 @@ class Sideway:
         self.sideway_ctr = 0
 
         isTerminate = True
+        self.start_time = timeit.default_timer()
+        print(f"initial value: {self.initial_value}\n")
         while isTerminate:
-            if self.best_value != 0:
-                neighbors= self.bestNeighbors()
-                if (neighbors.objective_function() == 0):
-                    self.best_state = neighbors
-                    self.best_value = neighbors.objective_function()
-                    break
-
-                if neighbors.objective_function() == self.current_value:
-                    self.sideway_ctr += 1
-                    self.sideway_step = 0
-                    while (self.sideway_step <= max_sideway_move):
-                        choosen_neighbor = self.move()
-                        if choosen_neighbor.objective_function() < self.current_value:
-                            self.best_state = choosen_neighbor
-                            self.current_value = choosen_neighbor.objective_function()
-                            break
-                        self.sideway_step += 1
-                elif neighbors.objective_function() < self.current_value:
-                    self.best_value = neighbors.objective_function()
-                    self.best_state = neighbors
-                else:
-                    isTerminate = True
             
+            neighbors= self.bestNeighbors()
+            if (self.best_value == 0) or neighbors is None:
+                self.end_time = timeit.default_timer()
+                # print('ke first ifelse\n')
+                break
+
+            self.step +=1
+            neighbor_value = neighbors.objective_function(square_error = self.square_error)
+            self.hist.append([self.step, self.current_value])
+
+            print(50*"- -")
+            print(f"step {self.step} ; best successor value: {neighbor_value} ; current value: {self.current_value}")
+            print(50*"- -")
+
+            if neighbor_value == self.current_value:
+                self.sideway_ctr += 1
+                self.sideway_step = 0
+                while (self.sideway_step < max_sideway_move):
+                    choosen_neighbor = self.move()
+                    choosen_value = choosen_neighbor.objective_function()
+                    if choosen_value < self.current_value:
+                        self.best_state = choosen_neighbor
+                        self.current_value = choosen_value
+                        break
+                    self.sideway_step += 1
+            elif neighbor_value < self.current_value:
+                self.best_state = copy.deepcopy(neighbors)
+                self.best_value = neighbor_value
+                self.current_state = copy.deepcopy(neighbors)
+                self.current_value = neighbor_value
+            else:
+                isTerminate = True
+        
             self.hist.append([
                 self.step,
                 self.sideway_ctr,
                 
             ])
             
-    def move(self):
+    def move(self,state):
         shape = self.cube.shape
+        moved_cube = copy.deepcopy(state)
         p0 = (np.random.randint(0,shape[0]),
               np.random.randint(0,shape[1]),
               np.random.randint(0,shape[2]))
@@ -59,27 +81,24 @@ class Sideway:
             p1 = (np.random.randint(0,shape[0]),
               np.random.randint(0,shape[1]),
               np.random.randint(0,shape[2]))
-        self.cube.array[p0], self.cube.array[p1] = self.cube.array[p1], self.cube.array[p0]
-
-        return self.cube
+        moved_cube.array[p0], moved_cube.array[p1] = moved_cube.array[p1], moved_cube.array[p0]
+        return moved_cube
     
     def bestNeighbors(self):
-        heuristic_cube = copy.deepcopy(self.current_state)
-        proposed_neighbors =[]
-        n = heuristic_cube.max_len()
+        first_neighbor = copy.deepcopy(self.current_state)
+        first_neighbor = self.move(first_neighbor)
+        best_value = first_neighbor.objective_function()
+        n = self.cube.max_len() ** 2
+        
         num_neighbors = int((n * (n-1))/2)
 
         for _ in range(num_neighbors):
-            new_cube = copy.deepcopy(self.move())
+            candidate = copy.deepcopy(first_neighbor)
+            candidate = self.move(candidate)
+            candidate_value = candidate.objective_function(square_error = self.square_error)
 
-            if new_cube.objective_function() < heuristic_cube.objective_function():
-                proposed_neighbors.append(new_cube)
+            if candidate_value <= best_value:
+                best_neighbor = candidate
+                best_value = candidate_value
 
-        best_neighbor = proposed_neighbors[0]
-        optimized_value = best_neighbor.objective_function()
-
-        for neighbor in proposed_neighbors[1:]:
-            neighbor_value = neighbor.objective_function()
-            if neighbor_value < optimized_value:
-                best_neighbor = neighbor
-        return best_neighbor
+        return best_neighbor if best_neighbor else None
