@@ -18,8 +18,8 @@ class Sideway:
         self.step = 0
         self.sideway_ctr = 0
 
-        isTerminate = False
-        while isTerminate == False:
+        isTerminate = True
+        while isTerminate:
             if self.best_value != 0:
                 neighbors= self.bestNeighbors()
                 if (neighbors.objective_function() == 0):

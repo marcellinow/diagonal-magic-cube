@@ -30,14 +30,20 @@ class Steepest:
         isTerminate = True
         while isTerminate:
             self.start_time = timeit.default_timer()
+            print(f"start_time: {self.start_time}\n")
             neighbors = self.bestNeighbors()
             if (self.best_value == 0) or neighbors is None:
+                print(f"end_time: {self.end_time}\n")
                 self.end_time = timeit.default_timer()
                 break
 
             self.step += 1
             neighbor_value = neighbors.objective_function(square_error = self.square_error)
             self.hist.append([self.step, self.current_value])
+
+            print(50*"- -\n")
+            print(f"step {self.step} ; best successor value: {neighbor_value} ; current value: {self.current_value}")
+            print(50*"- -\n")
             
             if neighbor_value <= self.current_value:
                 self.best_state = copy.deepcopy(neighbors)
@@ -46,6 +52,7 @@ class Steepest:
                 self.current_value = neighbor_value
             else:
                 self.end_time = timeit.default_timer()
+                print(f"end_time: {self.end_time}\n")
                 break
 
     def results(self):
