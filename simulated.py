@@ -44,6 +44,7 @@ class Simulated:
         self.tmax = tmax
         self.cooling_schedule = cooling_schedule
         self.step_max = step_max
+
         if function_error == 'squared':
             self.function_error = True
         else:
@@ -56,7 +57,7 @@ class Simulated:
 
         self.initial_state = copy.deepcopy(self.cube)
 
-        self.current_state = copy.deepcopy(self.cube).array
+        self.current_state = copy.deepcopy(self.cube)
         self.best_state = copy.deepcopy(self.current_state)
         self.best_energy = self.current_energy
 
@@ -179,7 +180,8 @@ class Simulated:
             '''
             This is move when you want a greedy move inside the algorithm
             '''
-            best_neighbor = copy.deepcopy(self.cube)
+            best_neighbor = copy.deepcopy(self.current_state)
+            candidate = copy.deepcopy(self.current_state)
             best_energy = self.best_energy
             for _ in range(10):
                 p1 = (np.random.randint(0, n), 
@@ -190,17 +192,17 @@ class Simulated:
                     p2 = (np.random.randint(0, n), 
                             np.random.randint(0, n), 
                             np.random.randint(0, n))
-                self.cube.array[p1], self.cube.array[p2] = self.cube.array[p2], self.cube.array[p1]
-                temp_energy = self.cube.objective_function(square_error = self.function_error)
+                candidate.array[p1], candidate.array[p2] = candidate.array[p2], candidate.array[p1]
+                temp_energy = candidate.objective_function(square_error = self.function_error)
 
                 if temp_energy < best_energy:
-                    best_neighbor = copy.deepcopy(self.cube)
+                    best_neighbor = copy.deepcopy(self.current_state)
                     best_energy = temp_energy
                 
-                self.cube.array[p2], self.cube.array[p1] = self.cube.array[p1], self.cube.array[p2]
-            self.cube = copy.deepcopy(best_neighbor)
+                candidate.array[p2], candidate.array[p1] = candidate.array[p1], candidate.array[p2]
+            return best_neighbor
         else:
-            neighbor = copy.deepcopy(self.cube)
+            neighbor = copy.deepcopy(self.current_state)
             p1 = (np.random.randint(0, n), 
                         np.random.randint(0, n), 
                         np.random.randint(0, n))
@@ -210,8 +212,7 @@ class Simulated:
                         np.random.randint(0, n), 
                         np.random.randint(0, n))
             neighbor.array[p1], neighbor.array[p2] = neighbor.array[p2], neighbor.array[p1]
-            self.cube = copy.deepcopy(neighbor)
-        return self.cube
+            return neighbor
     
     # Safe Exponential 
     def safe_exp(self,x):

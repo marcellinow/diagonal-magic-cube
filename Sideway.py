@@ -13,7 +13,6 @@ class Sideway:
         self.current_value = self.cube.objective_function()
         self.best_value = self.current_value
 
-        self.proposed_neighbor = copy.deepcopy(self.cube)
         self.hist = []
 
         self.step = 0
@@ -22,13 +21,13 @@ class Sideway:
         isTerminate = False
         while isTerminate == False:
             if self.best_value != 0:
-                neighbor = self.bestNeighbors()
-                if (neighbor.objective_function() == 0):
-                    self.best_state = neighbor
-                    self.best_value = neighbor.objective_function()
+                neighbors= self.bestNeighbors()
+                if (neighbors.objective_function() == 0):
+                    self.best_state = neighbors
+                    self.best_value = neighbors.objective_function()
                     break
 
-                if neighbor.objective_function() == self.current_value:
+                if neighbors.objective_function() == self.current_value:
                     self.sideway_ctr += 1
                     self.sideway_step = 0
                     while (self.sideway_step <= max_sideway_move):
@@ -38,9 +37,9 @@ class Sideway:
                             self.current_value = choosen_neighbor.objective_function()
                             break
                         self.sideway_step += 1
-                elif neighbor.objective_function() < self.current_value:
-                    self.best_value = neighbor.objective_function()
-                    self.best_state = neighbor
+                elif neighbors.objective_function() < self.current_value:
+                    self.best_value = neighbors.objective_function()
+                    self.best_state = neighbors
                 else:
                     isTerminate = True
             
@@ -50,8 +49,6 @@ class Sideway:
                 
             ])
             
-            
-
     def move(self):
         shape = self.cube.shape
         p0 = (np.random.randint(0,shape[0]),

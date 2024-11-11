@@ -1,7 +1,6 @@
 # Import Relevant Libraries
 import random
 import numpy as np
-from math import exp
 from tensor import *
 
 import copy
@@ -55,10 +54,7 @@ class Hill_climb:
 
             
     def best_successor(self):
-        
-        
-
-        
+            
         neighbors = []
         
         n = self.cube.max_len()
