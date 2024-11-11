@@ -83,7 +83,7 @@ class GeneticAlgo:
 
         # Final Solution
         print("Best solution found:")
-        best_solution.print_tensor()
+        best_solution.plot_cube()
         print("Fitness:", best_solution.objective_function())
 
     def sort_population_by_fitness(self, population):
