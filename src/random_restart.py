@@ -8,7 +8,7 @@ from hill_climb import Hill_climb as find_local_optimum
 
 import copy
 class Random_restart:
-    def __init__(self,cube, max_restart=100):
+    def __init__(self,cube, max_restart=10):
         '''
         parameters:
         - intial_state -> give the initial state of the problem space

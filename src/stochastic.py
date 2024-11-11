@@ -6,7 +6,7 @@ from tensor import *
 import copy
 
 class Stochastic:
-    def __init__(self, cube, max_iterations=100):
+    def __init__(self, cube, max_iterations=10):
         '''
         parameters:
         - cube -> initial state of the problem space
@@ -56,7 +56,7 @@ class Stochastic:
         return successor_cube
 
     def final_state(self):
-        return Tensor(5, 5, 5, self.best_state)
+        return Tensor(5, 5, 5, self.best_state.array)
 
     def results(self):
         print('+------------------------ RESULTS - -------------------------+\n')
