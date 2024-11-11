@@ -83,7 +83,6 @@ class GeneticAlgo:
             print("Generation: ", i+1, "Fitness: ", best_solution.objective_function())
 
         # Final Solution
-        print(len(self.history))
         print("Best solution found:")
         best_solution.plot_cube()
         print("Fitness:", best_solution.objective_function())
