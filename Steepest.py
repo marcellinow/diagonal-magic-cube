@@ -14,7 +14,7 @@ class Steepest:
             self.square_error = False
         else:
             self.square_error = True
-            
+
         self.cube = copy.deepcopy(cube)
         self.initial_value = self.cube.objective_function(square_error = self.square_error)
 
@@ -77,7 +77,7 @@ class Steepest:
             p1 = (np.random.randint(0,shape[0]),
               np.random.randint(0,shape[1]),
               np.random.randint(0,shape[2]))
-        moved_cube = state.copy()
+        moved_cube = copy.deepcopy(state)
         moved_cube.array[p0], moved_cube.array[p1] = moved_cube.array[p1], moved_cube.array[p0]
         return moved_cube
     
