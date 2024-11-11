@@ -51,7 +51,7 @@ class GeneticAlgoNJ:
 
     def select_parents(self):
        #! dari populasi dipilih secara random cube sebanyak tournament size, trus diambil 2 dengan fitness terbaik
-       tournament_size = 3
+       tournament_size = 5
        selected = random.sample(self.population, tournament_size)
        selected.sort(key=lambda tensor: self.fitness(tensor))
        return selected[0], selected[1]
