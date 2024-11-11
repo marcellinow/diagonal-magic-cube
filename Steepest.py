@@ -14,6 +14,7 @@ class Steepest:
             self.square_error = False
         else:
             self.square_error = True
+            
         self.cube = copy.deepcopy(cube)
         self.initial_value = self.cube.objective_function(square_error = self.square_error)
 
@@ -30,12 +31,12 @@ class Steepest:
 
     
         self.start_time = timeit.default_timer()
+
         print(f"initial value: {self.initial_value}\n")
+
         while True:
             neighbors = self.bestNeighbors()
-            if (self.best_value == 0) or neighbors is None:
-                self.end_time = timeit.default_timer()
-                # print('ke first ifelse\n')
+            if (self.best_value == 0) or not neighbors:
                 break
 
             self.step += 1
@@ -68,7 +69,6 @@ class Steepest:
     
     def move(self,state):
         shape = self.cube.shape
-        moved_cube = copy.deepcopy(state)
         p0 = (np.random.randint(0,shape[0]),
               np.random.randint(0,shape[1]),
               np.random.randint(0,shape[2]))
@@ -77,13 +77,14 @@ class Steepest:
             p1 = (np.random.randint(0,shape[0]),
               np.random.randint(0,shape[1]),
               np.random.randint(0,shape[2]))
+        moved_cube = state.copy()
         moved_cube.array[p0], moved_cube.array[p1] = moved_cube.array[p1], moved_cube.array[p0]
         return moved_cube
     
     def bestNeighbors(self):
-        first_neighbor = copy.deepcopy(self.current_state)
-        first_neighbor = self.move(first_neighbor)
-        best_value = first_neighbor.objective_function()
+        best_value = self.current_value
+        best_neighbor = None
+
         n = self.cube.max_len() ** 2
 
         best_neighbor = None
@@ -91,15 +92,13 @@ class Steepest:
         num_neighbors = int((n * (n-1))/2)
 
         for _ in range(num_neighbors):
-            candidate = copy.deepcopy(first_neighbor)
-            candidate = self.move(candidate)
+            candidate = self.move(self.current_state)
             candidate_value = candidate.objective_function(square_error = self.square_error)
 
             if candidate_value <= best_value:
                 best_neighbor = candidate
-                best_value = candidate_value
 
-        return best_neighbor if best_neighbor else None
+        return best_neighbor
 
     def hist_plot(self, title='Steepest Ascent Hill-Climbing Plot'):
 
